@@ -1,0 +1,18 @@
+*npm script基本概念：
+·npm script：npm脚本，是npm最强大、最常用的功能之一
+·npm script实例：
+    //package.json
+    {
+        "scripts": {
+            "build": "node build.js"
+        }
+    }
+  在命令行中执行npm run build，效果等同于执行node build.js
+·npm script原理：
+  当执行npm run命令时，会自动新建一个shell去执行里面的脚本，shell会将./node_modules./bin目录添加到PATH变量中。也就是说，如果./node_modules./.bin目录中的脚本，可以直接调用脚本名，不用去写完整的脚本路径或是全局安装脚本了。
+
+
+
+
+*文档：
+·《npm scripts 使用指南》：http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html

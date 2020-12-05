@@ -1,0 +1,51 @@
+*npm常用命令：
+·npm -v：查看npm版本
+·npm init：输出一个初始化的package.json文件;
+·npm init --yes：简写：npm init --y，快速创建一个带有默认信息的package.json的文件
+·npm init --force：简写：npm init --f，快速创建一个带有默认信息的package.json的文件
+·npm install <name> [-g] [--save-dev] :npm安装指定包;install别名：i, add
+  -- 无参数：同--save-prod
+  -- --global：简写-g，安装全局依赖
+  -- --save-prod：同-save，简写-S，将依赖信息加入到dependencies（生产环境的依赖）
+  -- --save-dev：简写-D，将依赖信息加入到devDependencies（开发环境的依赖）
+  -- --save-optional：简写-O，将依赖信息加入到optionalDependencies（可选阶段的依赖）
+  -- --save-exact：简写-E，精确安装依赖的版本，依赖信息将加入到dependencies
+  -- --no-save：只添加依赖，依赖信息不写入package.json
+·npm install npm@latest -g：更新npm版本
+·npm 包名的定义规则，npm还可以通过以下方式安装包：
+  -- npm install ./package-test/：安装本地包，./package-test/是一个本地package.json文件
+  -- npm install ./jquery-3.3.1.tar.gz：安装gzip压缩包
+  -- npm install https://github.com/lodash/lodash/archive/4.17.10.tar.gz：根据url链接安装包
+  -- npm install https://github.com/axios/axios.git：支持git格式的url安装包
+  -- npm install bootstarp@4.1.3：安装npm上指定版本的包
+  -- npm install babel-core@next：安装npm上指定tag版本的包，不写时默认tag为latest
+  -- npm config ls -l：查看npm的所有配置，配置说明（https://docs.npmjs.com/misc/config）
+  -- npm config set <key> <value>：修改配置命令：
+  -- npm config set registry https://registry.npmjs.org/：修改npm仓库源为淘宝镜像源：
+·npm uninstall <name> [-g] [--save-dev] ： npm卸载模块（卸载全局模块必须加-g）
+·npm cache clean --force ： 清空缓存
+·npm view jquery versions：查看jquery所有版本
+·npm list jquery：查看jquery当前版本
+·npm update <name> [-g] [--save-dev] ：更新指定模块
+·npm update [--save-dev]：更新全部插件
+·npm update -g：升级所有全局的本地包。
+·npm update：升级所有package.json中的包
+·npm view moduleNames：查看node模块的package.json文件夹
+注意事项：如果想要查看package.json文件夹下某个标签的内容，可以使用$npm view moduleName labelName
+·npm list：查看当前目录下已安装的node包。(npm list -g：查看所有全局安装的模块)
+注意事项：Node模块搜索是从代码执行的当前目录开始的，搜索结果取决于当前使用的目录中的node_modules下的内容。$ npm list parseable=true可以目录的形式来展现当前安装的所有node包
+·npm help：查看帮助命令
+·npm view moudleName dependencies：查看包的依赖关系
+·npm view moduleName repository.url：查看包的源文件地址
+·npm view moduleName engines：查看包所依赖的Node的版本
+·npm help folders：查看npm使用的所有文件夹
+·npm rebuild moduleName：用于更改包内容后进行重建
+·npm outdated：检查包是否已经过时，此命令会列出所有已经过时的包，可以及时进行包的更新
+·npm help json：一个npm包是包含了package.json的文件夹，package.json描述了这个文件夹的结构。是访问npm的json文件夹的方法。此命令会以默认的方式打开一个网页，如果更改了默认打开程序则可能不会以网页的形式打开。
+·npm search packageName：发布一个npm包的时候，需要检验某个包名是否已存在
+·npm root：查看当前包的安装路径
+·npm root -g：查看全局的包的安装路径
+
+
+
+

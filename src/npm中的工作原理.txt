@@ -1,0 +1,21 @@
+
+*文档：
+·《require工作原理》：https://blog.csdn.net/weixin_34355559/article/details/87957751
+
+*文档：
+·《深入理解前端模块加载机制，手写 node.js 的 require 函数》：https://zhuanlan.zhihu.com/p/266790788
+
+
+*npm的缺陷：
+*文档：
+·《node_modules 困境》：https://zhuanlan.zhihu.com/p/137535779
+
+
+
+
+·install中的缓存和资源拉取机制：https://blog.csdn.net/daihaoxin/article/details/105749014
+·npm install的实现原理:https://www.zhihu.com/question/66629910
+
+
+
+

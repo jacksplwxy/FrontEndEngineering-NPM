@@ -1,0 +1,24 @@
+*npx简介：
+·npm 5.2.0开始，自动安装了npx。万一不能用，就要手动安装一下：npm install -g npx
+·作用：npx会帮你执行依赖包里的二进制文件
+  例如npm：
+    npm i webpack -D      //非全局安装
+    ./node_modules/.bin/webpack -v  //执行webpack的命令
+  有了npx之后：
+    npm i webpack -D    //非全局安装
+    npx webpack -v 
+    npx会自动查找当前依赖包中的可执行文件，如果找不到，就会去PATH里找。如果依然找不到，就会帮你安装。
+·背景详情：
+  在过去的几年中，npm生态越来越倾向于将devDependencies安装包作为项目本地依赖安装，而不是让用户在全局安装。这意味着像mocha、gulp、bower、webpack甚至Vue这种我们过去主要是全局安装的命令行工具，现在可以基于项目维度来管理他们的版本。对于本地安装的 vue-cli ，你在初始化项目的时候，你可能需要如下操作：
+     ./node_modules/.bin/vue init webpack yourproject
+  或者，在 run-script 中声明：
+    "scripts": {
+       "init:runtime-only": "vue init webpack vue-cms",
+       "init-yourproject": "vue init webpack yourproject"
+    }
+  然后，执行：npm run init-yourproject
+  可以看到，这些 init 的操作都是属于一次性操作，但是却需要在 scripts 中声明，不科学！
+  那么，现在有了 npx 以后，操作就变得简单了：npx vue init webpack yourproject
+·文档：
+  -- 《npx 使用教程》：http://www.ruanyifeng.com/blog/2019/02/npx.html
+  -- 《非常好用的 npx!!!》https://blog.csdn.net/csdn_yudong/article/details/81670477

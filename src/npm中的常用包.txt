@@ -1,0 +1,216 @@
+﻿*chalk：
+·简介：改变console的颜色
+·实例：
+  -- console.log(chalk.red('  Build failed with errors.\n'))
+  -- console.log(chalk.yellow('  Build complete.\n'))
+
+*ora
+·简介：用于在node端显示加载中的效果，类似于前端页面的loading效果。
+·实例：
+const spinner = ora('Loading unicorns').start();
+setTimeout(() => {
+    spinner.color = 'yellow';
+    spinner.text = 'Loading rainbows';
+}, 1000);
+
+*rimraf：
+·简介：node使用rimraf来删除文件和文件夹的，不管文件夹是否为空，都可删除。典型用法是webpack build时，删除dist文件夹
+·实例：
+rimraf('./test.txt', function (err) { // 删除当前目录下的 test.txt
+  console.log(err);
+});
+
+*Semver
+·简介：Semver是一个专门分析Semantic Version（语义化版本）的工具，“semver”其实就是这两个单词的缩写。Npm使用了该工具来处理版本相关的工作。
+  semver可以作为一个node模块，同时也可以作为一个命令行工具。功能包括：
+  -- 比较两个版本号的大小
+  -- 验证某个版本号是否合法
+  -- 提取版本号，例如从“=v1.2.1”体取出"1.2.1"
+  -- 分析版本号是否属于某个范围或符合一系列条件
+  -- 等等...
+·实例：
+  // 计较两个版本号的大小
+  semver.gt('1.2.3', '2.3.4') // false
+  semver.lt('1.2.3', '2.3.4') // true
+  // 验证版本号是否合法，返回null即不合法
+  semver.valid('1.2.3') // '1.2.3'
+  semver.valid('a.b.c') // null
+  // 提取版本号
+  semver.clean('  =v1.2.3   ') // '1.2.3'
+  semver.major('1.2.3') // '1'
+  semver.minor('1.2.3') // '2'
+  semver.patch('1.2.3') // '3'
+
+*Shelljs：
+·简介：这个库能够让我们在js文件中执行shell命令，官网：https://github.com/shelljs/shelljs
+·例子：github提交文件
+  shell.exec('git add .');
+  shell.exec("git commit -m 'autocommit'")
+  shell.exec('git push')
+·文档：
+  -- 《用shelljs实现前端部署自动化》：https://segmentfault.com/a/1190000016054416
+
+*extract-text-webpack-plugin：
+·简介：一个webpack插件，主要是为了抽离css样式,防止将样式打包在js中引起页面样式加载错乱的现象;该插件有三个参数意义分别如下：
+  -- use:指需要什么样的loader去编译文件,这里由于源文件是.css所以选择css-loader
+  -- fallback:是指编译失败后用什么loader来提取css文件
+  -- publicfile:用来覆盖项目路径,生成该css文件的文件路径
+·例子：
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader"
+        })
+      }
+    ]
+  },
+  plugins: [
+    new ExtractTextPlugin("styles.css"),
+  ]
+}
+
+*optimize-css-assets-webpack-plugin
+·简介：压缩单独的css文件
+·例子：
+const optimizeCss = require('optimize-css-assets-webpack-plugin');
+plugins: [
+    new optimizeCss()
+]
+
+*uglifyjs-webpack-plugin
+·简介：UglifyJS Webpack Plugin插件用来缩小（压缩优化）js文件，至少需要Node v6.9.0和Webpack v4.0.0版本。
+·例子：
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+module.exports = {
+  optimization: {
+    minimizer: [new UglifyJsPlugin()],
+  },
+};
+
+*webpack-merge
+·简介：它允许连接数组并合并对象，而不是覆盖组合。
+·例子：
+const merge = require("webpack-merge");
+merge(
+    {a : [1],b:5,c:20},
+    {a : [2],b:10, d: 421}
+)
+//合并后的结果
+{a : [1,2] ,b :10 , c : 20, d : 421}
+·文档：https://www.cnblogs.com/wangtong111/p/11197313.html
+
+*html-webpack-plugin
+·简介：一个webpack插件，html-webpack-plugin可以根据你设置的模板，在每次运行后生成对应的模板文件，同时所依赖的CSS/JS也都会被引入，如果CSS/JS中含有hash值，则html-webpack-plugin生成的模板文件也会引入正确版本的CSS/JS文件。
+·例子：
+module.exports = {
+    plugins: [
+        new htmlWebpackPlugin({
+            title: "this is title", //用于生成的HTML文档的标题。
+            filename: "index.html", // 生成的模板文件的名字 默认index.html
+            template: "index.html", //模板来源文件
+            inject: false, //注入位置'head','body',true,false
+            favicon: "", //指定页面图标
+            minify: {
+                caseSensitive: false, ////是否大小写敏感
+                collapseBooleanAttributes: true, //是否简写boolean格式的属性如：disabled="disabled" 简写为disabled 
+                collapseWhitespace: true //是否去除空格
+            },
+            hash: true, //是否生成hash添加在引入文件地址的末尾，类似于我们常用的时间戳，这个可以避免缓存带来的麻烦
+            cache: true, //是否需要缓存，如果填写true，则文件只有在改变时才会重新生成
+            showErrors: true, //是否将错误信息写在页面里，默认true，出现错误信息则会包裹在一个pre标签内添加到页面上
+            chunks: ['a', 'b'], //引入的a,b模块，这里指定的是entry中设置多个js时，在这里指定引入的js，如果不设置则默认全部引入,数组形式传入
+            chunksSortMode: "auto", //引入模块的排序方式
+            excludeChunks: ['a', 'b'], //排除的模块,引入的除a,b模块以外的模块，与chunks相反
+            xhtml: false //生成的模板文档中标签是否自动关闭，针对xhtml的语法，会要求标签都关闭，默认false
+        })
+    ]
+};
+
+*friendly-errors-webpack-plugin
+·简介：一个webpack插件，Friendly-errors-webpack-plugin识别某些类别的webpack错误，并清理，聚合和优先级，以提供更好的开发人员体验。
+·例子：
+var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');  
+var webpackConfig = {   // ...   plugins: [     new FriendlyErrorsWebpackPlugin(),   ],   // ... }
+
+*portfinder
+·简介：当你默认8080端口被占用时，它会重新绑定一个8081端口。
+·例子：
+ portfinder.basePort = process.env.PORT || config.dev.port
+  portfinder.getPort((err, port) => {
+    if (err) {
+      reject(err)
+    } else {
+      process.env.PORT = port
+      devWebpackConfig.devServer.port = port
+      devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
+        compilationSuccessInfo: {
+          messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
+        },
+        onErrors: config.dev.notifyOnErrors
+        ? utils.createNotifierCallback()
+        : undefined
+      }))
+      resolve(devWebpackConfig)
+    }
+  })
+
+*copy-webpack-plugin
+·简介：静态文件拷贝
+·例子：
+ new CopyWebpackPlugin([
+       {
+         from:__dirname+'/public/lib',
+         to:__dirname+'/build/lib'
+       }
+  ])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

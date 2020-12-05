@@ -1,0 +1,2 @@
+*制作自己的npm包：
+·为npm包指定命令行和参数：https://www.jianshu.com/p/e213034ff85c

@@ -1,0 +1,39 @@
+*npmrc文件
+·修改npm配置除了命令借助命令行来完成，还可以通过.npmrc文件来修改配置
+·npm读取config配置的优先级：
+  ①工程目录下的.npmrc文件（/path/to/my/project/.npmrc）
+  ②用户配置文件（~/.npmrc）
+  ③全局配置文件（$PREFIX/etc/npmrc）
+  ④npm内置的配置文件（/path/to/npm/npmrc）
+
+
+*package.json是npm的配置文件，它的属性说明如下:
+·name - 包名。
+·version - 包的版本号。
+·description - 包的描述。
+·homepage - 包的官网 url 。
+·author - 包的作者姓名。
+·contributors - 包的其他贡献者姓名。
+·dependencies：指定依赖的其它包，这些依赖是指包发布后正常执行时所需要的，也就是线上需要的包。使用下面的命令来安装：npm install --save packageName
+·devDependencies：这些依赖只有在开发时候才需要。使用下面的命令来安装：npm install --save-dev packageName 
+·scripts：通过设置这个可以使NPM调用一些命令脚本，封装一些功能，如下：
+  "scripts": {
+      "start": "babel-node src/pages/index.js",  //相当于在cmd下输入babel-node src/pages/index.js
+      "build": "webpack --config config/webpack.config.js",  ////相当于在cmd下输入webpack --config config/webpack.config.js
+      "watch": "webpack-dev-server --config config/webpack.config.js --hot --inline --progress"
+  }
+·repository - 包代码存放的地方的类型，可以是 git 或 svn，git 可在 Github 上。
+·main - 可选字段。这个字段的值是你程序主入口模块的ID。如果其他用户需要你的包，当用户调用require()方法时，返回的就是这个模块的导出（exports）。。
+·keywords - 关键字
+
+
+*pacak-lock.json
+
+
+
+
+
+
+
+*文档：
+·《npm相关知识点总结》：https://segmentfault.com/a/1190000023549525
