@@ -1,0 +1,277 @@
+*js模块化简介：
+·es6之前的js是没有模块的，随着前端业务复杂化，js开发者先后提出多种社区模块化标准，并在es6中通过官方确定了js的模块化标准
+·js模块化的作用：
+  -- 防止变量污染：模块化允许将庞大的js代码拆分到多个独立的js文件中，如此，js之间的变量相互污染可能性就越低
+  -- 自动管理依赖关系：例如我们想使用easyui这个库，就必须要在引入这个库之前先引入jquery库，库与库之间有严格的先后依赖关系。当工程变得复杂后，这种关系可能变得错综复杂，难以理清，更难以维护。而模块化可以帮我们自动处理清楚依赖关系，不用管引入的先后顺序。这种依赖关系的实现原理可以参考
+  -- 防止区别不同变量时导致变量名过长，代码阅读困难：文件越大，变量越多，为了区分不同变量，不得不给变量起长名来区分
+  -- 利于提高代码质量：符合单一职责原则
+·模块化是js从脚本语言角色成长为工程语言角色的必经之路
+
+
+*js模块化发展史：
+·定义全局变量命名空间:
+  -- 即只创建一个全局变量，并定义该变量为当前应用容器，把其他全局变量追加在该命名空间下
+  -- 实例：
+      var person={
+          name:'jacksplwxy',
+          language:'中文',
+          intro:function(){
+              console.log('我的名字是：'+this.name);
+          },
+          speak:function(){
+              console.log('我能说：'+this.language);
+          },
+          init:function(){
+              this.intro();
+              this.speak();
+          }
+      };
+      person.init();
+  -- 缺点：这样的写法会暴露所有模块成员，内部状态可以被外部改写
+  -- 使用命名空间的应用实例：可以看到其具备污染小、结构清晰、代码易读、功能易扩展的特点，是模块功能出现前不错的实践
+     -- 《轮播图.js》：../src/轮播图.js
+     -- 《电梯效果.js》：../src/电梯效果.js
+·立即执行函数：
+  -- 利用匿名函数将脚本包裹起来
+  -- 该方案能够保证外部无法更改到内部的变量
+  -- 实例：
+      var person=(function(){
+          var name='jacksplwxy';
+          var language='中文';
+          var intro=function(){
+              console.log('我的名字是：'+name);
+          }
+          var speak=function(){
+              console.log('我能说：'+language);
+          }
+          return function(){
+              intro();
+              speak();
+          }
+      })();
+      person();
+  -- 实例：
+      var person=(function(){
+          var name='jacksplwxy';
+          var language='中文';
+          var intro=function(){
+              console.log('我的名字是：'+name);
+          }
+          var speak=function(){
+              console.log('我能说：'+language);
+          }
+          return {
+              init:function(){
+                  intro();
+                  speak();
+              }
+          }
+      })();
+      person.init();
+·立即执行函数依赖其他模块：
+  -- 独立性是模块的重要特点，模块内部最好不与程序的其他部分直接交互。为了在模块内部调用全局变量，必须显式地将其他变量输入模块。
+  -- 实例：
+  　　var person = (function ($, lodash) {
+  　　　　//...
+  　　})(jQuery, lodash);
+  -- 该书写范式也是jquery插件开发的基本要求：
+     https://github.com/jacksplwxy/jquery-playerDragBar/blob/master/dist/jquery.playerDragBar.js
+·前端模块化方案：
+  -- 立即执行函数能够很好地减少全局污染，但不能管理模块依赖，为此前端发展出多种模块化方案。
+  -- 前端模块化方案：
+     -- 社区方案：
+        -- CommonJS
+        -- AMD
+        -- CMD
+        -- UMD
+     -- 官方方案：
+        -- ES6模块
+·CommonJS：
+  -- CommonJS方案是众多前端模块化方案之一
+  -- CommonJS加载模块是同步的：意味着必须等模块加载完成才能继续往下执行代码，所有commonjs通常在后端加载本地文件使用
+  -- 根据CommonJS规范，一个单独的文件就是一个模块，require用来加载一个模块，exports用来向外部暴露该模块里的方法或属性。
+  -- Node.js就是遵循的CommonJS规范，由exports输出模块，require引入模块。
+  -- 当require引入一个模块时，会按顺序从上至下执行该模块内的代码。即require命令第一次加载该脚本，就会执行整个脚本，然后在内存生成一个对象。
+  -- 实例：
+      //定义一个module.js文件加粗样式
+      var A = function() {
+          console.log('我是定义的模块');
+      }
+      //导出这个模块
+      //1.第一种返回方式 module.exports = A; 
+      //2.第二种返回方式 module.exports.test = A
+      //3.第三种返回方式 exports.test = A;
+      exports.test = A;
+
+      //再写一个test.js文件，去调用刚才定义好的模块，这两个文件在同一个目录下
+      var module = require("./module");  //加载这个模块
+      //调用这个模块，不同的返回方式用不同的方式调用
+      //1.第一种调用方式 module();
+      //2.第二种调用方式 module.test();
+      //3.第三种调用方式 module.test();
+      module.test();
+·AMD：
+  -- AMD是"Asynchronous Module Definition"的缩写，意思就是"异步模块定义"。它采用异步方式加载模块，模块的加载不影响它后面语句的运行。所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。
+  -- AMD只有一个接口：define(id?,dependencies?,factory); 它要在声明模块的时候制定所有的依赖(dep)，并且还要当做形参传到factory中。要是没什么依赖，就定义简单的模块（或者叫独立的模块）
+  -- RequireJS实现了这种规范
+  -- RequireJS实例：
+    require(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
+      // some code here
+    });
+·CMD：
+  -- CMD也是异步加载模块，与AMD唯一的不同是对依赖模块的执行时机处理不同。具体为：AMD是依赖前置，一开始就加载所有依赖，js可以方便知道依赖模块是谁，立即加载；而CMD是依赖就近，需要使用模块时在define加载进来，较AMD更符合逻辑顺序。很多人觉得CMD的就近依赖需要把模块变为字符串解析一遍才知道依赖了那些模块，这样会影响性能，但实际上这对性能的影响很小，却能给开发带来逻辑上的便利性。
+  -- 国内优秀开发者玉伯开发Sea.js就是CMD的具体实现。
+·UMD：
+  -- umd是AMD和CommonJS的糅合。AMD浏览器第一的原则发展异步加载模块。CommonJS模块以服务器第一原则发展，选择同步加载，它的模块无需包装(unwrapped modules)。这迫使人们又想出另一个更通用的模式UMD（Universal Module Definition）。希望解决跨平台的解决方案。
+  -- 兼容多种模块规范的通用代码：
+      (function (root, factory) {
+          var JSLite = factory(root);
+          if (typeof define === 'function' && define.amd) {
+              // AMD
+              // define([], factory);
+              define('JSLite', function() { return JSLite; });
+          } else if (typeof exports === 'object') {
+              // Node.js
+              module.exports = JSLite;
+          } else {
+              // Browser globals
+              root.JSLite = JSLite;
+          }
+      })(this, function () {
+          //module ...
+      });
+  -- 兼容多种模块规范的实例代码：
+      ;(function(name,definition){
+          //检测上下文环境是否为AMD或CMD
+          var hasDefine = typeof define === 'function',
+              // 检测上下文环境是否为Node
+              hasExports = typeof module !== 'function' && module.exports;
+          if(hasDefine){
+              //AMD环境或CMD环境
+              define(definition);
+          }else if(hasExports){
+              //定义为普通Node模块
+              module.exports = definition();
+          }else{
+              //将模块的执行结果挂在window变量中，在浏览器中this指向window对象
+              this[name] = definition();
+          }
+      })('hello',function(){
+          var hello = function(){}
+          return hello
+      })
+·ES6模块方案：
+  -- ES6在语言标准的层面上实现了模块功能，完全可以取代 CommonJS、AMD和CMD规范，成为浏览器和服务器通用的模块解决方案。
+  -- ES6与社区模块方案的本质区别：
+     -- 社区模块方案：是将整个模块运行后转换成一个对象并赋值给某个变量，是运行的时候才能确定依赖关系
+     -- ES6模块方案：
+        -- 在编译的时候就能确定依赖关系，它只选择import的接口进行编译，这样在性能上比require好很多。
+        -- 由于ES6模块是编译时加载，使得静态分析成为可能。有了它，就能进一步拓宽 JavaScript 的语法，比如引入宏（macro）和类型检验（type system）这些只能靠静态分析实现的功能。
+        -- 除了静态加载带来的各种好处，ES6 模块还有以下好处。
+           -- 不再需要UMD模块格式了，将来服务器和浏览器都会支持 ES6 模块格式。目前，通过各种工具库，其实已经做到了这一点。
+           -- 将来浏览器的新 API 就能用模块格式提供，不再必须做成全局变量或者navigator对象的属性。
+           -- 不再需要对象作为命名空间（比如Math对象），未来这些功能可以通过模块提供。
+  -- 模块功能主要由两个命令构成：export和import。export命令用于规定模块的对外接口，import命令用于输入其他模块提供的功能
+  -- export default 和 export 区别：
+     -- 在一个文件或模块中，export、import可以有多个，export default仅有一个
+     -- 通过export方式导出，在导入时要加{ }，export default则不需要
+
+
+*CommonJS中加载模块的原理（require的原理）：
+·基本原理：
+  CommonJS的一个模块，就是一个脚本文件。require命令第一次加载该脚本，就会执行整个脚本，然后在内存生成一个对象：
+  {
+    id: '...',
+    exports: { ... },
+    loaded: true,
+    ...
+  }
+  上面代码中，该对象的id属性是模块名，exports属性是模块输出的各个接口，loaded属性是一个布尔值，表示该模块的脚本是否执行完毕，另外还有很多其他属性
+·模块加载原理：
+  let fs = require('fs');
+  function requ(moudleName) {
+      let content = fs.readFileSync(moudleName,'utf-8')
+      let fn = new Function('exports','module','__dirname','__filename',content + '\n return module.exports');
+      let module ={
+          exports:{}
+      }
+      return fn(module.exports,module,req,__dirname,__filename)
+  }
+  let str = requ("./a.js")
+·文档：
+  -- 《require() 源码解读》：http://www.ruanyifeng.com/blog/2015/05/require.html
+  -- 《面试官说：说一说CommonJs的实现原理》：https://www.cnblogs.com/chenshufang/p/9927543.html
+
+
+*AMD中的模块加载原理：
+·模块加载原理：
+  req.createNode = function (config, moduleName, url) {
+      var node = config.xhtml ?
+              document.createElementNS('http://www.w3.org/1999/xhtml', 'html:script') :
+              document.createElement('script');
+      node.type = config.scriptType || 'text/javascript';
+      node.charset = 'utf-8';
+      node.async = true;
+      return node;
+  };
+  //在这段代码中我们可以看出， requirejs 导入模块的方式实际就是创建脚本标签，一切的模块都需要经过这个方法创建。
+  node.addEventListener('load', context.onScriptLoad, false);
+  node.addEventListener('error', context.onScriptError, false);
+  //通过load和error事件，监听模块是否加载完成，以实现异步操作
+·依赖管理原理：
+  -- 依赖管理大致分为三个功能：
+     -- handle：对开发者输入的参数进行区分，运行对应的功能；
+     -- setModule：建立开发者想要的模块，如果存在便调用；
+     -- loadModule： 加载需要的模块，加载模块的依赖；
+  -- A过程(引入单依赖)：
+      //A.js
+      define(['B'], function (B){
+        B();
+      });
+     解析：
+     1、我在A.JS中，希望加载一个B模块，并执行回调（ B()）;
+     2、AMD拿到信息，在内部注册了一个B模块，并保存了加载完后要执行的（B()）
+     3、AMD发现B模块没有加载过，那么loadJs（B.js），B模块的load状态为 ‘loading’；
+     4 、loadJs 开始往<body></body>appendChild（B.js）;
+     5、B.js 被加载进来，js引擎开始执行代码，AMD发现B.js中存在B.js模块的定义代码；
+     6、因为AMD中B模块已经存在并且是 loading 状态，这个时候B.js中的模块定义更新了
+AMD中的B模块状态为 loaded，并执行一直托管的回调（B（））
+  -- B过程(引入多依赖)
+      //B.js
+      define(['B','C','D'], function (B,C,D){
+        B(); C(); D();
+      });
+     解析：与A过程 最大的区别就是，在handle过程中，就是对开发者信息输入的处理中，会对多个依赖分配一个共同该多依赖的长度length，然后给每个依赖一个内部的回调，当某个依赖加载完全（这个依赖页面中定义的该依赖代码执行）后，length -- ；当length === 0 时，执行AA.js中定义的回调, B()、C()、D()
+
+
+*模块的循环依赖：
+·什么是循环依赖：
+  //A.js
+  let b = require('./B');
+  console.log(b);
+  module.exports = {
+      A: 'this is a Object'
+  };
+  //B.js
+  let a = require('./A');
+  console.log(a);
+  module.exports = {
+      B: 'this is b Object'
+  };
+  当使用node执行A.js时，第一行require('./B')执行，进入B.js。B.js执行第一行，进入A.js。如此行成循环依赖
+·commonjs解决循环依赖的原理：
+  一旦出现某个模块被"循环加载"，就只输出已经执行的部分，还未执行的部分不会输出。
+·es6模块解决循环依赖的原理：
+  ES6模块的运行机制与CommonJS不一样，它遇到模块加载命令import时，不会去执行模块，而是只生成一个引用。等到真的需要用到时，再到模块里面去取值。
+  因此，ES6模块是动态引用，不存在缓存值的问题，而且模块里面的变量，绑定其所在的模块。
+  ES6根本不会关心是否发生了"循环加载"，只是生成一个指向被加载模块的引用，需要开发者自己保证，真正取值的时候能够取到值。
+·文档：
+  -- 《Node.js中的模块循环依赖及其解决》：https://zhuanlan.zhihu.com/p/22711570
+  -- 《JavaScript 模块的循环加载》:http://www.ruanyifeng.com/blog/2015/11/circular-dependency.html
+
+
+
+
+
+
+
