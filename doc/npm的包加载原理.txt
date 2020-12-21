@@ -1,0 +1,136 @@
+*package（包）和module（模块）：
+·package：
+  -- 包含了package.json
+  -- 使用package.json定义的一个package，通常是对应一个module
+  -- 使用package.json定义的一个package，也可以不包含module。比如bin里指明一个shell脚本,甚至是任意文件（将registry当做http服务器使用，或者利用unpkg当做cdn使用）,一个package可以是一个tar包，也可以是本地file协议，甚至git仓库地址
+·module：
+  -- 能被require加载的就叫一个module。
+  -- 如下都是module：
+     -- 一个包含package.json且含有main字段的文件夹
+     -- 一个含有index.js的文件夹
+     -- 任意的js文件
+  -- 只有当module含有package.json的时候才能叫做package
+·module不一定是package，package不一定是module
+
+
+*npm包加载的基本概念：
+·Node模块加载是CommonJS方案的具体实现
+·CommonJS的核心思想是通过rquire方法来同步加载依赖的其他模块，通过module.exports暴露接口。
+·当Node遇到require(X),按照下面的顺序处理:
+  1、判断是否为内置模块
+     -- 如果是内置模块，比如require('http')，则返回该模块，并且不再继续执行
+     -- 如果不是内置模块，继续往下执行
+  2、判断X是否以'./' 或者 '../ '开头
+    -- 如果X以'./' 或者 '../ '开头，则说明该模块是指定了路径的模块，按如下流程执行：
+       1、根据X所在的父模块，确定X的绝对路径
+       2、将X当成文件，依次查找下面文件，只要其中有一个存在，就返回该文件，不再继续执行。否则继续往下执行
+            +----------------------+
+            |  .x                  |
+            |  .x.js               |
+            |  .x.json             |
+            |  .x.node             |
+            +--------------------  + 
+        3、将X当成目录，一次查找下面文件，只要其中有一个存在，就返回该文件，不再继续执行。否则继续往下执行
+            +----------------------------+
+            |  .X/package.json(main字段) |
+            |  .X/index.js               |
+            |  .X/index.json             |
+            |  .X/index.node             |
+            +--------------------------- +
+        4、以上两步都无法找到模块时，抛出 "Cannot find module"
+    -- 如果X不以'./' 或者 '../ '开头，则说明该模块是通过npm管理的第三方包模块，按如下流程执行：
+        1、根据X所在的父模块，确定X可能的安装目录，按如下顺序查找：
+           1、在主程序同级目录下的node_modules目录中查找模块包
+              -- 若找到了，则在包目录下的package.json文件中找到main属性，main属性的值就是要加载的文件。
+                 如果包目录下没有package.json文件，或者package.json文件中没有main属性，则会默认加载包目录下的index.js文件
+              -- 若没有找到，则继续往下执行
+           2、在主程序的上一级目录中查找node_modules文件夹，查找方式同上
+           3、如果一直找到根目录下都没有找到，则尝试去全局安装路径查找
+           4、如果以上所有路径都未找到，则会报错：Error: Cannot find module
+        2、依次在每个目录中， 将X当成文件名或目录名加载
+        3、以上步骤都无法找到模块时，抛出 "Cannot find module"
+
+
+*Node模块加载的源码分析：
+·Module对象：
+  -- Node内部提供了一个Mudule构建函数，所有模块都是Module的实例。
+  -- 源码：
+        function Module(id, parent){
+            this.id = id;
+            this.exports = {};
+            this.parent = parent;
+            this.filename = null;
+            this.loaded = false;
+            this.children = []
+        }
+        module.exports = Module;
+        var module = new Module(filename, parent)
+  -- 属性分析：
+     -- module.id：模块的识别符，通常是带有绝对路径的模块文件名。
+     -- module.filename：模块的文件名，带有绝对路径。
+     -- module.loaded：返回一个布尔值，表示模块是否已经完成加载。
+     -- module.parent：返回一个对象，表示调用该模块的模块。
+     -- module.children：返回一个数组，表示该模块要用到的其他模块。
+     -- module.exports：表示模块对外输出的值
+  -- require的源码在Node的lib/module.js文件。可以看到，当前模块(module.js)也是Moudle的一个实例。
+·模块实例的require方法
+    Module.prototype.require = function(path){
+        return Module._load(path, this)  
+    }
+·Module._load源码：
+    Module._load = function(request, parent, isMain) {
+        //  计算绝对路径
+        var filename = Module._resolveFilename(request, parent);
+        //  第一步：如果有缓存，取出缓存
+        var cachedModule = Module._cache[filename];
+        if (cachedModule) {
+            return cachedModule.exports;
+        }
+        // 第二步：是否为内置模块
+        if (NativeModule.exists(filename)) {
+            return NativeModule.require(filename);
+        }
+        // 第三步：生成模块实例，存入缓存
+        var module = new Module(filename, parent);
+        Module._cache[filename] = module;
+        // 第四步：加载模块
+        try {
+            module.load(filename);
+            hadException = false;
+        } finally {
+            if (hadException) {
+            delete Module._cache[filename];
+            }
+        }
+        // 第五步：输出模块的exports属性
+        return module.exports;
+    };
+·module.load源码：
+    Module.prototype.load = function (filename) {
+        var extension = path.extname(filename)  || 'js'
+        if(!Module._extensions[extensions]) extension = '.js'
+        Module._extensions[extension](this, filename)
+        this.loaded = true
+    }
+·Module._extensions源码：
+    Module._extensions['.js'] = function(module, filename) {
+        var content = fs.readFileSync(filename, 'utf8');
+        module._compile(stripBOM(content), filename);
+    };
+    Module._extensions['.json'] = function(module, filename) {
+        var content = fs.readFileSync(filename, 'utf8');
+        try {
+            module.exports = JSON.parse(stripBOM(content));
+        } catch (err) {
+            err.message = filename + ': ' + err.message;
+            throw err;
+        }
+    };
+
+
+
+
+*文档：
+·《require() 源码解读》：http://www.ruanyifeng.com/blog/2015/05/require.html
+
+

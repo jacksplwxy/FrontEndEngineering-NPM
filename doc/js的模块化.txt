@@ -3,6 +3,7 @@
 ·js模块化的作用：
   -- 防止变量污染：模块化允许将庞大的js代码拆分到多个独立的js文件中，如此，js之间的变量相互污染可能性就越低
   -- 自动管理依赖关系：例如我们想使用easyui这个库，就必须要在引入这个库之前先引入jquery库，库与库之间有严格的先后依赖关系。当工程变得复杂后，这种关系可能变得错综复杂，难以理清，更难以维护。而模块化可以帮我们自动处理清楚依赖关系，不用管引入的先后顺序。这种依赖关系的实现原理可以参考
+  -- 方便管理项目的依赖版本
   -- 防止区别不同变量时导致变量名过长，代码阅读困难：文件越大，变量越多，为了区分不同变量，不得不给变量起长名来区分
   -- 利于提高代码质量：符合单一职责原则
 ·模块化是js从脚本语言角色成长为工程语言角色的必经之路
@@ -187,20 +188,7 @@
     ...
   }
   上面代码中，该对象的id属性是模块名，exports属性是模块输出的各个接口，loaded属性是一个布尔值，表示该模块的脚本是否执行完毕，另外还有很多其他属性
-·模块加载原理：
-  let fs = require('fs');
-  function requ(moudleName) {
-      let content = fs.readFileSync(moudleName,'utf-8')
-      let fn = new Function('exports','module','__dirname','__filename',content + '\n return module.exports');
-      let module ={
-          exports:{}
-      }
-      return fn(module.exports,module,req,__dirname,__filename)
-  }
-  let str = requ("./a.js")
-·文档：
-  -- 《require() 源码解读》：http://www.ruanyifeng.com/blog/2015/05/require.html
-  -- 《面试官说：说一说CommonJs的实现原理》：https://www.cnblogs.com/chenshufang/p/9927543.html
+·详细原理参考：./npm的包加载原理.txt
 
 
 *AMD中的模块加载原理：
