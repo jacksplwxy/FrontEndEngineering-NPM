@@ -1,3 +1,7 @@
+*基本概念：
+·软链接：windows上的快捷方式就是软链接
+·硬链接：硬链接指通过索引节点来进行的链接，其作用是允许一个文件拥有多个有效路径名，能够达到误删除的作用。
+
 *简介：
 ·pnpm是一款与npm/yarn功能类似的包管理器
 ·特点：
@@ -31,3 +35,4 @@
 *文档：
 ·《github · pnpm》https://github.com/pnpm/pnpm
 ·《复习之pnpm》：https://zhuanlan.zhihu.com/p/165041115
+·《node_modules 困境》：https://zhuanlan.zhihu.com/p/137535779

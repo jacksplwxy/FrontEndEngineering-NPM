@@ -10,7 +10,7 @@
   -- 会自动处理多个包之间的依赖
   -- 管理包的版本
 ·官网：https://www.npmjs.com/
-·常用命令：见《npm的常用命令》
+·常用命令：./npm的常用命令.txt
 
 *npm包的安装：
 ·npm安装依赖包的2种方式：
@@ -30,7 +30,8 @@
 ·cnpm和npm:
   -- cnpm：因为npm安装插件是从国外服务器下载，受网络影响大，淘宝在国内更新npm就是cnpm。
   -- cnpm安装方式：npm install cnpm -g --registry=https://registry.npm.taobao.org，安装后记得重启，不然容易错误。
-  -- cnpm跟npm用法完全一致，只是在执行命令时将npm改为cnpm。
+  -- cnpm跟npm用法基本一致，只是在执行命令时将npm改为cnpm。
+  -- cnpm安装时，不会自动创建lock文件
 
 
 *npm的依赖包版本管理策略：
@@ -68,9 +69,19 @@
 ·npm5依然采用扁平结构，还引入了package-lock.json文件，它可以锁定依赖的安装结构和版本等信息。
 ·更多详情：./npm的设计缺陷.txt
 
-*npm的常见问题：
-·场景：公共模块在不同层级文件中被引用时，引入路径复杂，非常不方便，难维护。
-  解决：本地包应用：为了更优雅的引用，可以利用npm本地包将公共模块封装到node_modules中。
-·场景：使用一个npm包时发现它有bug，也找出了它的问题，并直接在node_modules中修复了它，这样并没有用。因为在.gitignore文件一般会忽略提交node_modules，即node_modules不在版本控制内，即使修复了它，下次下载依赖是还是会覆盖修复。
-  解决：先在git仓库中fork要修复的npm包，然后在自己的仓库中修复该问题，最后在package.json中引用自己的git url即可解决问题。
 
+
+*Q&A:
+·公共模块在不同层级文件中被引用时，引入路径复杂，非常不方便，难维护，应当如何处理？
+  本地包应用：为了更优雅的引用，可以利用npm本地包将公共模块封装到node_modules中。
+·使用一个npm包时发现它有bug，也找出了它的问题，并直接在node_modules中修复了它，这样并没有用。因为在.gitignore文件一般会忽略提交node_modules，即node_modules不在版本控制内，即使修复了它，下次下载依赖是还是会覆盖修复。如何处理？
+  先在git仓库中fork要修复的npm包，然后在自己的仓库中修复该问题，最后在package.json中引用自己的git url即可解决问题。
+·npm如何安装同一个包的多个版本：
+  -- npm i <alias>@npm:<packageName>@版本
+  -- 实例：
+      npm i antd3@npm:antd@3
+      npm i antd4@npm:antd@4
+·npm install发生了什么？
+  https://www.zhihu.com/question/66629910
+·npm包的缓存机制：
+  https://blog.csdn.net/daihaoxin/article/details/105749014

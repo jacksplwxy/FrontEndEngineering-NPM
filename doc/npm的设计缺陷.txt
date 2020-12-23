@@ -9,9 +9,16 @@
   -- 多重依赖：指从所需软件包到最底层软件包之间的层级数过多。这会导致依赖性解析过于复杂，并且容易产生依赖冲突和环形依赖
   -- 依赖冲突：即两个软件包无法共存的情况。除两个软件包包含内容直接冲突外，也可能因为其依赖的低层软件包互相冲突。因此，两个看似毫无关联的软件包也可能因为依赖性冲突而无法安装
   -- 依赖循环：即依赖性关系形成一个闭合环路，最终导致：在安装A软件包之前，必须要安装A、B、C、D软件包，然而这是不可能的
+·node解决依赖地狱的策略：
+  -- node的解决方式是依赖的node加载模块的路径查找算法和node_modules的目录结构来配合解决的
+  -- 模块的路径查找算法有2个核心：
+     -- 优先读取最近的node_modules的依赖
+     -- 递归向上查找node_modules依赖
+  -- 该算法虽然简化了Dependency hell的解决方式，也带来了非常多的问题
 
 
-*node_modules的缺陷：
+
+*模块路径查找算法+node_modules目录结构的缺陷：
 ·nest mode：
   -- 该策略是依赖谁就安装谁
   -- npm2采用的该策略对包进行管理
@@ -73,14 +80,14 @@
   -- semver的破坏导致依赖差异：
      当部分依赖不遵守semver时，测试时候的代码和上线的代码可能并不是完全一致的，导致项目上线出现问题
   -- 写死版本不一定奏效：
-     为保证项目的依赖一致性，首先想到的办法是直接把第三方依赖版本都写死。然而问题并没这么简单，例如虽然你锁定了webpack的版本，但是webpack的依赖却没法锁定，如果webpack的某个依赖法生产不遵循semver的breaking change，我们的应用还是会受到影响，除非我们保证所有的第三方以及第三方的依赖都是写死版本，这即意味着整个社区放弃semver，这显然是不可能的。
+     为保证项目的依赖一致性，首先想到的办法是直接把依赖的第三方版本都写死。然而问题并没这么简单，例如虽然你锁定了webpack的版本，但是webpack的依赖却没法锁定，如果webpack的某个依赖法生产不遵循semver的breaking change，我们的应用还是会受到影响，除非我们保证所有的第三方以及第三方的依赖都是写死版本，这即意味着整个社区放弃semver，这显然是不可能的。
   -- yarn lock vs npm lock：一个更加靠谱的写法是将项目里的依赖和第三方的依赖同时锁定，yarn的lock和npm的lock都支持该功能。
   -- npm5采用的该策略对包进行管理，安装时默认产生lock文件
   -- lock也不是万能的：
      当我们第一次安装创建项目时或者第一次安装某个依赖的时候，此时即使第三方库里含有lock文件，但是npm install|(yarn install) 并不会去读取第三方依赖的lock，这导致第一次创建项目的时候，用户还是会可能触发bug。这在全局安装cli的场景下非常常见，经常会碰到上一次安装全局cli的时候正常，但是重新安装这个版本的cli却挂了，这很有可能是该cli的版本的某个上游依赖发生了breaking change,因为不存在全局环境的lock
-  -- 初次安装就出现依赖breaking change的救火方案：
-     如果你某天安装了一个新的webpack-cli，却发现这个webpack-cli并不能正常工作，经过一番定位发现，是该cli的一个上游依赖portfinder的最近一个版本有bug，但是该cli的作者在休假，没办法及时修复这个cli，但项目赶着上线该怎么处理？yarn提供了一个叫做[https://classic.yarnpkg.com/en/docs/selective-version-resolutions/](https://classic.yarnpkg.com/en/docs/selective-version-resolutions/)的机制，使得你可以忽略dependency的限制，强行将portfinder锁定为某个没有bug的版本，以解燃眉之急
-     npm本身没有提供resolution机制，但是可以通过npm-froce-resolution这个库实现类似机制
+  -- shrinkwrap：
+     shrinkwrap是初次安装就出现依赖breaking change的解决方案
+     如果你某天安装了一个新的webpack-cli，却发现这个webpack-cli并不能正常工作，经过一番定位发现，是该cli的一个上游依赖portfinder的最近一个版本有bug，但是该cli的作者在休假，没办法及时修复这个cli，但项目赶着上线该怎么处理？yarn提供了一个叫做[https://classic.yarnpkg.com/en/docs/selective-version-resolutions/](https://classic.yarnpkg.com/en/docs/selective-version-resolutions/)的机制，使得你可以忽略dependency的限制，强行将portfinder锁定为某个没有bug的版本，以解燃眉之急。npm可以使用npm shrinkwrap实现该机制
   -- 库里应该提交lock文件吗？
      前面提到npm和yarn在install的时候并不会读取第三方库里的lock文件，那么我们编写库的时候还有必要提供lock文件吗。不知道大家有没有过这种经验，某天发现了某个第三方库存在某个bug，摩拳擦掌的将该库下载下来，准备修复下发个mr，一顿npm install && npm build 操作猛如虎，然后就见到了一堆莫名其妙的编译错误，这些错误很可能个是编译工具的某个上游依赖的breaking change所致，经过一番google + stackoverflow仍然没有修复，这时候就基本上断了提mr的冲动，如果库的开发者将当前的编译环境的lock提交上来，则很大程度上可以避免该问题。
   -- determinism：
@@ -89,38 +96,16 @@
      -- 事实上yarn仅保证了同一版本的确定性而无法保证不同版本的确定性，npm则保证了不同版本的确定性。
         -- yarn.lock保证了所有第三方库和其依赖的版本号是锁定的，虽然保证了版本，但是实际上yarn.lock里并没有包含任何的node_modules拓扑信息
         -- npm的lock信息则包含了拓扑结构信息
+  -- 补充：《为什么我不使用 shrinkwrap（lock）》：https://zhuanlan.zhihu.com/p/22934066
 
 
-*相对路径的缺陷：
-·
-
-
-*require的缓存机制的缺陷：
-·node会对加载的模块进行缓存，第一次加载某个模块后会将结果缓存下来，后续的require调用都返回同一结果。
- 然而node的require的缓存并非是基于module名，而是基于resolve的文件路径的，且是大小写敏感的，这意味着即使你代码里看起来加载的是同一模块的同一版本，如果解析出来的路径名不一致，那么会被视为不同的module
-
-
-
-*npm对多版本的包的管理策略：
-
-*npm包的安装机制：http://www.ruanyifeng.com/blog/2016/01/npm-install.html
-
-*npm包的目录结构
-
-
-*npm包的缓存机制
-
-
-
-*npm的缺陷：
 *文档：
 ·《node_modules 困境》：https://zhuanlan.zhihu.com/p/137535779
 
 
 
 
-·install中的缓存和资源拉取机制：https://blog.csdn.net/daihaoxin/article/details/105749014
-·npm install的实现原理:https://www.zhihu.com/question/66629910
+
 
 
 
