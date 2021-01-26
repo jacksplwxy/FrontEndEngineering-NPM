@@ -1,4 +1,4 @@
-*npm script基本概念：
+*npm script基本概念： 
 ·npm script：npm脚本，是npm最强大、最常用的功能之一
 ·npm script实例：
     //package.json
@@ -11,6 +11,13 @@
 ·npm script原理：
   当执行npm run命令时，会自动新建一个shell去执行里面的脚本，shell会将./node_modules./bin目录添加到PATH变量中。也就是说，如果./node_modules./.bin目录中的脚本，可以直接调用脚本名，不用去写完整的脚本路径或是全局安装脚本了。
 
+
+*npm script的实战应用：
+·监听文件变化并自动运行npm script
+·结合live-reload实现自动刷新
+·在git hooks中运行npm script
+·用npm script实现构建流水线
+·用npm script实现服务自动化运维
 
 
 

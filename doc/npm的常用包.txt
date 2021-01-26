@@ -159,7 +159,7 @@ var webpackConfig = {   // ...   plugins: [     new FriendlyErrorsWebpackPlugin(
     }
   })
 
-*copy-webpack-plugin
+*copy-webpack-plugin 
 ·简介：静态文件拷贝
 ·例子：
  new CopyWebpackPlugin([

@@ -13,7 +13,7 @@
 ·module不一定是package，package不一定是module
 
 
-*npm包加载的基本概念：
+*npm包加载的基本概念： 
 ·Node模块加载是CommonJS方案的具体实现
 ·CommonJS的核心思想是通过rquire方法来同步加载依赖的其他模块，通过module.exports暴露接口。
 ·当Node遇到require(X),按照下面的顺序处理:

@@ -1,5 +1,5 @@
 *yarn的基本概念
-·什么是yarn：与npm类似的包管理工具
+·什么是yarn：与npm类似的包管理工具 
 ·yarn和npm的区别：https://blog.csdn.net/qq_27674439/article/details/93976115
   -- npm是围绕着语义版本控制（semver）的思想而设计的，yarn一开始的主要目标是解决由于语义版本控制而导致的npm安装的不确定性问题。虽然可以使用npm shrinkwrap来实现可预测的依赖关系树，但它并不是默认选项，而是取决于所有的开发人员知道并且启用这个选项。
      yarn采取了不同的做法。每个yarn安装都会生成一个类似于npm-shrinkwrap.json的yarn.lock文件，而且它是默认创建的。除了常规信息之外，yarn.lock文件还包含要安装的内容的校验和，以确保使用的库的版本相同。

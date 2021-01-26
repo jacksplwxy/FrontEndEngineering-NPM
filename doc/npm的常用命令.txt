@@ -1,5 +1,5 @@
 *npm常用命令：
-·npm -v：查看npm版本
+·npm -v：查看npm版本 
 ·npm init：输出一个初始化的package.json文件;
 ·npm init --yes：简写：npm init --y，快速创建一个带有默认信息的package.json的文件
 ·npm init --force：简写：npm init --f，快速创建一个带有默认信息的package.json的文件

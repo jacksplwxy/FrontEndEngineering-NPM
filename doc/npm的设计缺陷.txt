@@ -76,18 +76,20 @@
      -- 不可预知的bug，本来以为某个版本只是bug fix，发布了patch版本，但是该patch却引入了未预料的breaking change（不兼容改版）导致semver被破坏
      -- semver的设计过于理想，实际上即使是最小的bug fix，如果业务方无意中依赖了这个bug，仍然会导致breaking change，bug和breaking change的界限是模糊的
      -- 认为semver没有太大意义，例如Typescript官方就承认从未遵循semver语义，实际上typescript经常在minor版本引入各种breaking change
-·lock：
+·lock： 
   -- semver的破坏导致依赖差异：
      当部分依赖不遵守semver时，测试时候的代码和上线的代码可能并不是完全一致的，导致项目上线出现问题
   -- 写死版本不一定奏效：
      为保证项目的依赖一致性，首先想到的办法是直接把依赖的第三方版本都写死。然而问题并没这么简单，例如虽然你锁定了webpack的版本，但是webpack的依赖却没法锁定，如果webpack的某个依赖法生产不遵循semver的breaking change，我们的应用还是会受到影响，除非我们保证所有的第三方以及第三方的依赖都是写死版本，这即意味着整个社区放弃semver，这显然是不可能的。
   -- yarn lock vs npm lock：一个更加靠谱的写法是将项目里的依赖和第三方的依赖同时锁定，yarn的lock和npm的lock都支持该功能。
   -- npm5采用的该策略对包进行管理，安装时默认产生lock文件
-  -- lock也不是万能的：
+  -- lock也不是万能的： 
      当我们第一次安装创建项目时或者第一次安装某个依赖的时候，此时即使第三方库里含有lock文件，但是npm install|(yarn install) 并不会去读取第三方依赖的lock，这导致第一次创建项目的时候，用户还是会可能触发bug。这在全局安装cli的场景下非常常见，经常会碰到上一次安装全局cli的时候正常，但是重新安装这个版本的cli却挂了，这很有可能是该cli的版本的某个上游依赖发生了breaking change,因为不存在全局环境的lock
   -- shrinkwrap：
-     shrinkwrap是初次安装就出现依赖breaking change的解决方案
-     如果你某天安装了一个新的webpack-cli，却发现这个webpack-cli并不能正常工作，经过一番定位发现，是该cli的一个上游依赖portfinder的最近一个版本有bug，但是该cli的作者在休假，没办法及时修复这个cli，但项目赶着上线该怎么处理？yarn提供了一个叫做[https://classic.yarnpkg.com/en/docs/selective-version-resolutions/](https://classic.yarnpkg.com/en/docs/selective-version-resolutions/)的机制，使得你可以忽略dependency的限制，强行将portfinder锁定为某个没有bug的版本，以解燃眉之急。npm可以使用npm shrinkwrap实现该机制
+     -- shrinkwrap是初次安装就出现依赖breaking change的解决方案
+     -- 如果你某天安装了一个新的webpack-cli，却发现这个webpack-cli并不能正常工作，经过一番定位发现，是该cli的一个上游依赖portfinder的最近一个版本有bug，但是该cli的作者在休假，没办法及时修复这个cli，但项目赶着上线该怎么处理？yarn提供了一个叫做[https://classic.yarnpkg.com/en/docs/selective-version-resolutions/](https://classic.yarnpkg.com/en/docs/selective-version-resolutions/)的机制，使得你可以忽略dependency的限制，强行将portfinder锁定为某个没有bug的版本，以解燃眉之急。npm可以使用npm shrinkwrap实现该机制
+     -- npm shrinkwrap时会生成npm-shrinkwrap.json文件，该文件将可以将所有层级依赖的版本进行锁定，保证所有曾经依赖版本完全一致
+     -- npm shrinkwrap也不是万能药，它将导致版本锁定而不敢升级，具体讨论看这里：《为什么我不使用 shrinkwrap（lock）》：https://zhuanlan.zhihu.com/p/22934066
   -- 库里应该提交lock文件吗？
      前面提到npm和yarn在install的时候并不会读取第三方库里的lock文件，那么我们编写库的时候还有必要提供lock文件吗。不知道大家有没有过这种经验，某天发现了某个第三方库存在某个bug，摩拳擦掌的将该库下载下来，准备修复下发个mr，一顿npm install && npm build 操作猛如虎，然后就见到了一堆莫名其妙的编译错误，这些错误很可能个是编译工具的某个上游依赖的breaking change所致，经过一番google + stackoverflow仍然没有修复，这时候就基本上断了提mr的冲动，如果库的开发者将当前的编译环境的lock提交上来，则很大程度上可以避免该问题。
   -- determinism：
@@ -96,7 +98,6 @@
      -- 事实上yarn仅保证了同一版本的确定性而无法保证不同版本的确定性，npm则保证了不同版本的确定性。
         -- yarn.lock保证了所有第三方库和其依赖的版本号是锁定的，虽然保证了版本，但是实际上yarn.lock里并没有包含任何的node_modules拓扑信息
         -- npm的lock信息则包含了拓扑结构信息
-  -- 补充：《为什么我不使用 shrinkwrap（lock）》：https://zhuanlan.zhihu.com/p/22934066
 
 
 *文档：

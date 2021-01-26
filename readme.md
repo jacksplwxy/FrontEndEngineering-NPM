@@ -10,7 +10,7 @@
 ### [· npm的脚本](./doc/npm的脚本.txt)
 ### [· js的模块化](./doc/js的模块化.txt)
 ### [· npm的包加载原理](./doc/npm的包加载原理.txt)
-### [· npm的设计缺陷(./doc/npm的设计缺陷.txt)
+### [· npm的设计缺陷](./doc/npm的设计缺陷.txt)
 ### [· npm的常用包](./doc/npm的常用包.txt)
 ### [· npm包的自制](./doc/npm包的自制.txt)
 ### [· npx](./doc/npx.txt)

@@ -12,6 +12,7 @@
 ·官网：https://www.npmjs.com/
 ·常用命令：./npm的常用命令.txt
 
+
 *npm包的安装：
 ·npm安装依赖包的2种方式：
   -- 全局安装：npm install gulp -g 或 npm install gulp --global
@@ -26,12 +27,26 @@
      -- 本地安装的优点：可以让每个项目拥有独立的包，不受全局包的影响，方便项目的移动、复制、打包等，保证不同版本包之间的相互依赖。另外，本地安装包对于项目的加载会更快。
      -- 本地安装的缺点：每次新项目都要本地安装所依赖的包，安装包时间相对较长，一来是包太大导致下载慢；二是浪费了硬盘空间。
 
-*npm的数据源：
-·cnpm和npm:
-  -- cnpm：因为npm安装插件是从国外服务器下载，受网络影响大，淘宝在国内更新npm就是cnpm。
+
+*数据源：
+·不同的包服务器就是不同的数据源。因为npm安装包默认是从国外服务器下载，受网络影响大，我们一般会下载在国内的淘宝镜像数据，地址为：https://registry.npm.taobao.org
+·npm设置数据源：
+  -- 临时办法：
+     npm install --registry=https://registry.npm.taobao.org
+     每次install带上registry参数指定数据源
+  -- 写入配置文件
+     npm config set registry https://registry.npm.taobao.org
+     该命令会在～/.npmrc文件里面增加一个配置（如果没有.npmrc文件会自动创建一个）
+     可以使用下面的命令验证是否生效：npm config get registry
+·cnpm:
+  -- cnpm是一个与npm功能类似的包管理工具，主要区别是其默认的数据源为淘宝源
+  -- cnpm跟npm用法基本一致，只是在执行命令时将npm改为cnpm
   -- cnpm安装方式：npm install cnpm -g --registry=https://registry.npm.taobao.org，安装后记得重启，不然容易错误。
-  -- cnpm跟npm用法基本一致，只是在执行命令时将npm改为cnpm。
-  -- cnpm安装时，不会自动创建lock文件
+  -- cnpm与lock：
+     -- cnpm安装时，不会自动创建lock文件，并且后续应该也不会支持，参考这里：https://github.com/cnpm/cnpm/issues/226
+     -- cnpm install时不读锁文件，直接读package.json
+     -- 想要根据lock文件安装依赖时不建议使用cnpm，可以通过指定源的方式安装：npm install --registry=https://registry.npm.taobao.org i
+     -- cnpm安装时不会自动创建lock文件,可以通过npm shrinkwrap生成一个npm-shrinkwrap.json文件，此文件会锁定所有的依赖来源
 
 
 *npm的依赖包版本管理策略：
@@ -63,12 +78,40 @@
   -- 当提交了package.json，package-lock.json的更新后，应及时拉取更新，并重新npm install重新安装更新后的依赖
 
 
+*npm的配置：
+·npmrc文件
+  -- 修改npm配置除了命令借助命令行来完成，还可以通过.npmrc文件来修改配置
+  -- npm读取config配置的优先级：
+     1、工程目录下的.npmrc文件（/path/to/my/project/.npmrc）
+     2、用户配置文件（~/.npmrc）
+     3、全局配置文件（$PREFIX/etc/npmrc）
+     4、npm内置的配置文件（/path/to/npm/npmrc）
+·package.json：
+  npm的配置文件，它的属性说明如下:
+  -- name：包名。
+  -- version：包的版本号。
+  -- description：包的描述。
+  -- homepage：包的官网 url 。
+  -- author：包的作者姓名。
+  -- contributors：包的其他贡献者姓名。
+  -- dependencies：指定依赖的其它包，这些依赖是指包发布后正常执行时所需要的，也就是线上需要的包。使用下面的命令来安装：npm install --save packageName
+  -- devDependencies：这些依赖只有在开发时候才需要。使用下面的命令来安装：npm install --save-dev packageName 
+  -- scripts：通过设置这个可以使NPM调用一些命令脚本，封装一些功能，如下：
+      "scripts": {
+          "start": "babel-node src/pages/index.js",  //相当于在cmd下输入babel-node src/pages/index.js
+          "build": "webpack --config config/webpack.config.js",  ////相当于在cmd下输入webpack --config config/webpack.config.js
+          "watch": "webpack-dev-server --config config/webpack.config.js --hot --inline --progress"
+      }
+  -- repository：包代码存放的地方的类型，可以是 git 或 svn，git 可在 Github 上。
+  -- main：可选字段。这个字段的值是你程序主入口模块的ID。如果其他用户需要你的包，当用户调用require()方法时，返回的就是这个模块的导出（exports）。。
+  -- keywords：关键字
+
+
 *npm的历史版本：
 ·npm2采用的是递归安装的方法，当项目较复杂时，目录结构也会很深，会出现超出windows系统中路径超过260字符的错误；部分相同的依赖包也会被重复安装，造成大量冗余。
 ·npm3采用扁平结构优化解决了以上问题，但也导致了npm依赖树不能和文件结构所对应了，可以通过npm ls来查看模块间的依赖关系。
 ·npm5依然采用扁平结构，还引入了package-lock.json文件，它可以锁定依赖的安装结构和版本等信息。
 ·更多详情：./npm的设计缺陷.txt
-
 
 
 *Q&A:
