@@ -17,8 +17,21 @@
 ### [· yarn](./doc/yarn.txt)
 ### [· pnpm](./doc/pnpm.txt)
 
+
 <br/>
 <br/>
 
 ## 许可协议：
 &emsp;&emsp;本项目所有文档遵循[CC-BY-SA 4.0协议](https://creativecommons.org/licenses/by-sa/4.0/deed.zh)。使用者可以对本创作进行转载、节选、混编、二次创作，可以将其运用于商业用途，唯须署名作者，并且采用本创作的内容必须同样采用本协议进行授权
+
+<br/>
+<br/>
+
+## 更多前端工程化内容
+### [· npm](https://github.com/jacksplwxy/npm)
+### [· webpack](https://github.com/jacksplwxy/webpack)
+### [· 代码质量](https://github.com/jacksplwxy/Good-Code)
+### [· 前端自动化测试](https://github.com/jacksplwxy/AutoTest)
+### [· 前端性能优化](https://github.com/jacksplwxy/FrontEndPerformanceOptimization)
+### [· web安全](https://github.com/jacksplwxy/security)
+### [· 持续集成/持续部署](https://github.com/jacksplwxy/CI-CD)
