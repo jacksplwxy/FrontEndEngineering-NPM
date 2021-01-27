@@ -118,7 +118,8 @@
 ·公共模块在不同层级文件中被引用时，引入路径复杂，非常不方便，难维护，应当如何处理？
   本地包应用：为了更优雅的引用，可以利用npm本地包将公共模块封装到node_modules中。
 ·使用一个npm包时发现它有bug，也找出了它的问题，并直接在node_modules中修复了它，这样并没有用。因为在.gitignore文件一般会忽略提交node_modules，即node_modules不在版本控制内，即使修复了它，下次下载依赖是还是会覆盖修复。如何处理？
-  先在git仓库中fork要修复的npm包，然后在自己的仓库中修复该问题，最后在package.json中引用自己的git url即可解决问题。
+  方法一：把修改后的代码换个名字重新打个包提交到npm，然后直接引用这个新包
+  方法二：把代码copy移出node_modules作为本地依赖
 ·npm如何安装同一个包的多个版本：
   -- npm i <alias>@npm:<packageName>@版本
   -- 实例：
