@@ -10,7 +10,8 @@
   在命令行中执行npm run build，效果等同于执行node build.js
 ·npm script原理：
   当执行npm run命令时，会自动新建一个shell去执行里面的脚本，shell会将./node_modules./bin目录添加到PATH变量中。也就是说，如果./node_modules./.bin目录中的脚本，可以直接调用脚本名，不用去写完整的脚本路径或是全局安装脚本了。
-
+· node_modules .bin 目录哪里来的？
+https://www.zhihu.com/question/333901187/answer/744807871
 
 *npm script的实战应用：
 ·监听文件变化并自动运行npm script
