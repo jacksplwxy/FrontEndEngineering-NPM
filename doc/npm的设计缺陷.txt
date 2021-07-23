@@ -3,6 +3,7 @@
  · 包的多版本共存问题：
    ~ 通常包都允许多个版本同时存在于项目中
    ~ 部分包本身就不支持多版本共存，例如core-js会污染全局环境
+   ~ 不同版本的包的文件夹名称都必须是一致的，只是版本号不一样，否则就是不同的包了
  · 什么是依赖地狱？
    在软件管理的领域里存在着被称作“依赖地狱”的死亡之谷，系统规模越大，加入的套件越多，你就越有可能在未来的某一天发现自己已深陷绝望之中。在依赖高的系统中发布新版本套件可能很快会成为恶梦。如果依赖关系过高，可能面临版本控制被锁死的风险（必须对每一个相依套件改版才能完成某次升级）。而如果依赖关系过于松散，又将无法避免版本的混乱（假设兼容于未来的多个版本已超出了合理数量）。当你专案的进展因为版本相依被锁死或版本混乱变得不够简便和可靠，就意味着你正处于依赖地狱之中。
  · 依赖地狱的特点：
@@ -20,7 +21,7 @@
 
 
 *模块路径查找算法+node_modules目录结构的缺陷：
- · nest mode：
+ · nest mode（嵌套模式）：
    ~ 该策略是依赖谁就安装谁
    ~ npm2采用的该策略对包进行管理
    ~ 该方案的node_modules结构如下：
@@ -36,8 +37,8 @@
       ~ 不同的依赖书分支中，可能有大量实际上是同版本的依赖
       ~ 安装时额外下载或者拷贝了大量重复的资源，造成了极大的空间浪费
       ~ 安装速度慢
- · flat mode：
-   ~ 该策略利用向上递归查找依赖的特性，将一些公共依赖放在公共的node_module里
+ · flat mode（扁平模式）：
+   ~ 该策略利用向上递归查找依赖的特性，将一些公共依赖放在首层公共的node_module里
    ~ npm3采用的该策略对包进行管理
    ~ 该方案的node_modules结构如下：
      mod-a → mod-b@1.0
@@ -56,16 +57,18 @@
         mod-e → mod-b@1.0
         mod-b@2.0
         解析：
-          我们发现无论是把b@2.0还是b@1.0放在top level,都会导致另一个版本任何会存在重复的问题。
+          我们发现无论是把b@2.0还是b@1.0放在top level,都会导致另一个版本仍然会存在重复的问题。
           doppelgangers导致的重复问题，除了浪费空间和加长安装时间，还会导致另一个小问题：全局types冲突。
-         ~ 全局types冲突：
-           虽然各个package之前的代码不会相互污染，但是他们的types仍然可以相互影响，很多的第三方库会修改全局的类型定义。
-           典型的就是@types/react,例如出现：‘Duplicate identifier 'FormData'’，错误原因就在于全局的types形成了命名冲突，因此假如版本重复可能会导致全局的类型错误。
-           一般的解决方式就是自己控制包含哪些加载的@types/xxx
+      ~ 全局types冲突：
+        虽然各个package之前的代码不会相互污染，但是他们的types仍然可以相互影响，很多的第三方库会修改全局的类型定义。
+        典型的就是@types/react,例如出现：‘Duplicate identifier 'FormData'’，错误原因就在于全局的types形成了命名冲突，因此假如版本重复可能会导致全局的类型错误。
+        一般的解决方式就是自己控制包含哪些加载的@types/xxx
       ~ phantom depdency：
          ~ 把一个库使用了不属于其depdencies里的package称之为 phantom depdencies
          ~ 实例：例如当我们在开发环境中安装rimraf包时，即使glob和brace-expansion包都在depdencies里，我们仍能在代码使用glob和brace-expansion，因为他们两个都是rimraf的依赖，在被复用的情况下放到了公共node_module中。一旦将该库发布，因为用户安装我们的库的时候并不会安装库的devDepdency，这导致在用户的地方会运行报错。
-      ~ 在基于yarn或者npm的node_modules的结构下，doppelganger和phantom dependency似乎并没有太好的解决方式。其本质是因为npm和yarn通过node resolve算法配合node_modules的树形结构对原本depdency graph的模拟
+      ~ 依赖结构的不确定性：
+        假如A依赖C_1.0,B依赖C_1.1,先安装A时决定了首层是C_1.0,先安装B时决定了首层是C_1.1,这样A和B的位置顺序决定了目录结构的不一致
+    ~ 在基于yarn或者npm的node_modules的结构下，doppelganger和phantom dependency似乎并没有太好的解决方式。其本质是因为npm和yarn通过node resolve算法配合node_modules的树形结构对原本depdency graph的模拟
  · Semver：
    ~ Semver：语义化的版本控制
    ~ 产生背景：当项目引入的依赖越来越多时，很容易导致依赖地域的产生。而Semver是解决地狱依赖的有效方式之一
@@ -77,7 +80,8 @@
       ~ 不可预知的bug，本来以为某个版本只是bug fix，发布了patch版本，但是该patch却引入了未预料的breaking change（不兼容改版）导致semver被破坏
       ~ semver的设计过于理想，实际上即使是最小的bug fix，如果业务方无意中依赖了这个bug，仍然会导致breaking change，bug和breaking change的界限是模糊的
       ~ 认为semver没有太大意义，例如Typescript官方就承认从未遵循semver语义，实际上typescript经常在minor版本引入各种breaking change
- · lock： 
+ · lock：
+   ~ lock文件主要解决flat mode带来的3个问题： 
    ~ semver的破坏导致依赖差异：
      当部分依赖不遵守semver时，测试时候的代码和上线的代码可能并不是完全一致的，导致项目上线出现问题
    ~ 写死版本不一定奏效：

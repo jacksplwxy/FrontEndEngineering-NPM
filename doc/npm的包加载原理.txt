@@ -1,4 +1,4 @@
-*npm包的下载和加载是不同的概念
+*npm包的下载（install）和加载（require）是不同的概念
 
 *package（包）和module（模块）：
 ·package：
