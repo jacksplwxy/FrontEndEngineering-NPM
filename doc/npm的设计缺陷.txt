@@ -96,7 +96,13 @@
       ~ npm shrinkwrap时会生成npm-shrinkwrap.json文件，该文件将可以将所有层级依赖的版本进行锁定，保证所有曾经依赖版本完全一致
       ~ npm shrinkwrap也不是万能药，它将导致版本锁定而不敢升级，具体讨论看这里：《为什么我不使用 shrinkwrap（lock）》：https://zhuanlan.zhihu.com/p/22934066
    ~ 库里应该提交lock文件吗？
-     前面提到npm和yarn在install的时候并不会读取第三方库里的lock文件，那么我们编写库的时候还有必要提供lock文件吗。不知道大家有没有过这种经验，某天发现了某个第三方库存在某个bug，摩拳擦掌的将该库下载下来，准备修复下发个mr，一顿npm install && npm build 操作猛如虎，然后就见到了一堆莫名其妙的编译错误，这些错误很可能个是编译工具的某个上游依赖的breaking change所致，经过一番google + stackoverflow仍然没有修复，这时候就基本上断了提mr的冲动，如果库的开发者将当前的编译环境的lock提交上来，则很大程度上可以避免该问题。
+     ~ 锁定规则
+       ~ 当package-lock.json中的依赖锁定版本符合package.json中的版本号范围时，将以package-lock.json锁死版本号为主。
+       ~ 当package-lock.json中的依赖锁定版本不符合package.json中的版本号范围时，将会安装符合package.json版本号范围的最新版本号依赖，并重写package-lock.json文件
+     ~ 要不要提交package-lock
+       前面提到npm和yarn在install的时候并不会读取第三方库里的lock文件，那么我们编写库的时候还有必要提供lock文件吗。不知道大家有没有过这种经验，某天发现了某个第三方库存在某个bug，摩拳擦掌的将该库下载下来，准备修复下发个mr，一顿npm install && npm build 操作猛如虎，然后就见到了一堆莫名其妙的编译错误，这些错误很可能个是编译工具的某个上游依赖的breaking change所致，经过一番google + stackoverflow仍然没有修复，这时候就基本上断了提mr的冲动，如果库的开发者将当前的编译环境的lock提交上来，则很大程度上可以避免该问题。
+         ~ 对于项目开发而言，有必要。当有了lock文件时，每一个依赖的版本号都被锁死在了lock文件，每次依赖安装的版本号都从lock文件中进行获取，避免了不可测的依赖风险。
+         ~ 对于库开发而言，也有必要。虽然项目中所有依赖都会根据项目lockfile锁死而并不会依照库依赖的lockfile，但是为了贡献者能很容易地将项目跑起来，devDependencies必须在库的lockfile中锁定。
    ~ determinism：
       ~ determinism指的是在给定package.json和lock文件下，每次重新install都会得到同样的node_modules的拓扑结构。
       ~ 版本确定性 !== 拓扑确定性

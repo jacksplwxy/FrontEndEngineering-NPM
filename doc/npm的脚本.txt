@@ -1,26 +1,101 @@
-*npm script基本概念： 
-·npm script：npm脚本，是npm最强大、最常用的功能之一
-·npm script实例：
+* npm script基本概念： 
+  · npm script：npm脚本，是npm最强大、最常用的功能之一
+  · npm script实例：
     //package.json
     {
         "scripts": {
             "build": "node build.js"
         }
     }
-  在命令行中执行npm run build，效果等同于执行node build.js
-·npm script原理：
-  当执行npm run命令时，会自动新建一个shell去执行里面的脚本，shell会将./node_modules./bin目录添加到PATH变量中。也就是说，如果./node_modules./.bin目录中的脚本，可以直接调用脚本名，不用去写完整的脚本路径或是全局安装脚本了。
-· node_modules .bin 目录哪里来的？
-https://www.zhihu.com/question/333901187/answer/744807871
+    在命令行中执行npm run build，效果等同于执行node build.js
+  · npm script原理：
+    ~ 每当执行npm run xx，就会自动新建一个Shell，在这个Shell里面执行指定的脚本命令。因此，只要是Shell可以运行的命令，一般是Bash，就可以写在npm脚本里面。
+    ~ npm run新建的这个Shell，会将当前目录的node_modules/.bin子目录加入PATH变量，执行结束后，再将PATH变量恢复原样，这也就是为什么npm run指向的命令能够被执行的原因。
+  · node_modules .bin 目录哪里来的？
+    当某个模块配置了bin定义时，就会被安装的时候，自动软链了过去。如mocha源码配置了：
+      {
+        "name":"mocha",
+        "bin":{
+          "mocha":"./bin/mocha"
+        }
+      }
+    https://www.zhihu.com/question/333901187/answer/744807871
 
-*npm script的实战应用：
-·监听文件变化并自动运行npm script
-·结合live-reload实现自动刷新
-·在git hooks中运行npm script
-·用npm script实现构建流水线
-·用npm script实现服务自动化运维
+
+* 执行顺序：
+  · $npm run xx & npm run xxx同时并行执行
+  · $npm run xx && npm run xxx 前一个执行成功，再执行最后一个
+  · windows暂不支持并行，可以通过安装npm-run-all、Concurrently模块解决
+
+
+* 环境变量:
+  · process.env.npm_lifecycle_event：当前执行的脚本名，例如执行npm run npm run build:dev，则打印build:dev
+  · process.env.npm_package_xxx：获得到package.json中的内容，例如通过process.env.npm_package_name可以获取到package.json中name的值；通过 process.env.npm_package_repository_type可以拿到值git。
+  · process.env.npm_config_xxx：获取npm config中的值。比如，process.env.npm_config_user_email 可以拿到 user.email 的值
+
+
+* 钩子：
+  · pre和post：
+    ~ npm run为每条命令提供了pre和post两个钩子（hook）。以npm run lint为例，执行这条命令之前，npm会先查看有没有定义prelint和postlint两个钩子，如果有的话，就会先执行npm run prelint，然后执行npm run lint，最后执行npm run postlint。
+    ~ 如果执行过程出错，就不会执行排在后面的脚本，即如果prelint脚本执行出错，就不会接着执行lint和postlint脚本。
+    ~ 另外，不能在pre脚本之前再加pre，即preprelint脚本不起作用。
+  · 默认钩子：
+    ~ prepublish/postpublish：发布一个模块前/后执行。
+    ~ preinstall/postinstall：安装一个模块前/后执行。
+    ~ preuninstall/postuninstall：卸载一个模块前/后执行。
+    ~ preversion/postversion：更改模块版本前/后执行。
+    ~ pretest/posttest：运行npm test命令前/后执行。
+    ~ prestop/poststop：运行npm stop命令前/后执行。
+    ~ prestart/poststart：运行npm start命令前/后执行。
+    ~ prerestart/postrestart：运行npm restart命令前/后执行。如果没有设置restart脚本，则依次执行stop和start脚本。
+
+* 传参：
+  · 向 npm 脚本传入参数，要使用--标明
+  · 实例：
+    例如定义如下脚本命令：
+      "scripts": {
+          "build:local": "vue-cli-service build --mode local"
+      }
+    通过shell.js调用命令，并传入参数，实现umd打包：
+      `npm run build:${ProjectNODE_ENV} -- --target lib --name CustomPluginsUMDModule --inline-vue --dest server2c/public/engine_libs/${ProjectName}/${ProjectNODE_ENV}/${ProjectVersion}/customPlugins custom/src/plugins/index.js`
+
+* 默认脚本：
+  · 一般来说，npm脚本由用户提供。但是，npm对两个脚本提供了默认值。也就是说，这两个脚本不用定义，就可以直接使用。下面代码中，npm run start的默认值是node server.js，前提是项目根目录下有server.js这个脚本；npm run install的默认值是node-gyp rebuild，前提是项目根目录下有binding.gyp文件：
+    "start": "node server.js"，
+    "install": "node-gyp rebuild"
+
+* 通配符
+  · 由于 npm 脚本就是 Shell 脚本，因为可以使用 Shell 通配符。例如下面代码中，*表示任意文件名，**表示任意一层子目录：
+    "lint": "jshint *.js"
+    "lint": "jshint **/*.js"
+  · 规则如下：
+    ~ *：匹配0个或多个字符
+    ~ ?：匹配1个字符
+    ~ [...]：匹配某个范围的字符。如果该范围的第一个字符是!或^，则匹配不在该范围的字符。
+    ~ !(pattern|pattern|pattern)：匹配任何不符合给定的模式
+    ~ ?(pattern|pattern|pattern)：匹配0个或1个给定的模式
+    ~ +(pattern|pattern|pattern)：匹配1个或多个给定的模式
+    ~ *(a|b|c)：匹配0个或多个给定的模式
+    ~ @(pattern|pat*|pat?erN)：只匹配给定模式之一
+    ~ **：如果出现在路径部分，表示0个或多个子目录。
+
+
+* 简写形式：
+  · 四个常用的npm脚本有简写形式：
+    ~ npm start是npm run start
+    ~ npm stop是npm run stop的简写
+    ~ npm test是npm run test的简写
+    ~ npm restart是npm run stop && npm run restart && npm run start的简写
+
+* npm script的实战应用：
+  · 监听文件变化并自动运行npm script
+  · 结合live-reload实现自动刷新
+  · 在git hooks中运行npm script
+  · 用npm script实现构建流水线
+  · 用npm script实现服务自动化运维
 
 
 
-*文档：
-·《npm scripts 使用指南》：http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html
+* 文档：
+  · 《npm scripts 使用指南》：http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html
+  · 《npm学习（十七）之node_modules中的bin文件夹》：http://t.zoukankan.com/kunmomo-p-14151480.html
