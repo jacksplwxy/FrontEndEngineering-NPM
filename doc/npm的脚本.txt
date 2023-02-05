@@ -32,7 +32,9 @@
   · process.env.npm_lifecycle_event：当前执行的脚本名，例如执行npm run npm run build:dev，则打印build:dev
   · process.env.npm_package_xxx：获得到package.json中的内容，例如通过process.env.npm_package_name可以获取到package.json中name的值；通过 process.env.npm_package_repository_type可以拿到值git。
   · process.env.npm_config_xxx：获取npm config中的值。比如，process.env.npm_config_user_email 可以拿到 user.email 的值
-
+  · 自定义环境变量：
+    例如：npm run build IsEMAS=true
+    if (process.env.IsEMAS === 'true') { }
 
 * 钩子：
   · pre和post：
@@ -58,6 +60,7 @@
       }
     通过shell.js调用命令，并传入参数，实现umd打包：
       `npm run build:${ProjectNODE_ENV} -- --target lib --name CustomPluginsUMDModule --inline-vue --dest server2c/public/engine_libs/${ProjectName}/${ProjectNODE_ENV}/${ProjectVersion}/customPlugins custom/src/plugins/index.js`
+
 
 * 默认脚本：
   · 一般来说，npm脚本由用户提供。但是，npm对两个脚本提供了默认值。也就是说，这两个脚本不用定义，就可以直接使用。下面代码中，npm run start的默认值是node server.js，前提是项目根目录下有server.js这个脚本；npm run install的默认值是node-gyp rebuild，前提是项目根目录下有binding.gyp文件：

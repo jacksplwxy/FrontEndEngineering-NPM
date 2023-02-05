@@ -1,131 +1,186 @@
-*npm简介：
-·npm：
-  -- node package manager，即node的包管理工具
-  -- 随着其它构建工具(webpack、browserify)的发展，"node package manager"已经变成了"package manager for JavaScript"
-·背景： 
-  -- 为啥我们需要一个包管理工具呢？因为我们在Node.js上开发时，会用到很多别人写的JavaScript代码。如果我们要使用别人写的某个包，每次都根据名称搜索一下官方网站，下载代码，解压，再使用，非常繁琐。于是一个集中管理的工具应运而生：大家都把自己开发的模块打包后放到npm官网上，如果要使用，直接通过npm安装就可以直接用，不用管代码存在哪，应该从哪下载。
-  -- 更重要的是，如果我们要使用模块A，而模块A又依赖于模块B，模块B又依赖于模块X和模块Y，npm可以根据依赖关系，把所有依赖的包都下载下来并管理起来。否则，靠我们自己手动管理，肯定既麻烦又容易出错。
-·作用：
-  -- 安装、管理和分享JavaScript包
-  -- 会自动处理多个包之间的依赖
-  -- 管理包的版本
-·官网：https://www.npmjs.com/
-·常用命令：./npm的常用命令.txt
+* npm简介：
+  · npm：
+    ~ node package manager，即node的包管理工具
+    ~ 随着其它构建工具(webpack、browserify)的发展，"node package manager"已经变成了"package manager for JavaScript"
+  · 背景： 
+    ~ 为啥我们需要一个包管理工具呢？因为我们在Node.js上开发时，会用到很多别人写的JavaScript代码。如果我们要使用别人写的某个包，每次都根据名称搜索一下官方网站，下载代码，解压，再使用，非常繁琐。于是一个集中管理的工具应运而生：大家都把自己开发的模块打包后放到npm官网上，如果要使用，直接通过npm安装就可以直接用，不用管代码存在哪，应该从哪下载。
+    ~ 更重要的是，如果我们要使用模块A，而模块A又依赖于模块B，模块B又依赖于模块X和模块Y，npm可以根据依赖关系，把所有依赖的包都下载下来并管理起来。否则，靠我们自己手动管理，肯定既麻烦又容易出错。
+  · 作用：
+    ~ 安装、管理和分享JavaScript包
+    ~ 会自动处理多个包之间的依赖
+    ~ 管理包的版本
+  · 官网：https://www.npmjs.com/
+  · 常用命令：./npm的常用命令.txt
 
 
-*npm包的安装：
-·npm安装依赖包的2种方式：
-  -- 全局安装：npm install gulp -g 或 npm install gulp --global
-  -- 本地安装：npm install gulp 或 npm install gulp --save-dev
-     -- save代表把你的安装包信息写入package.json文件。npm 5.0.0之前，有--save参数才会把模块写入到packages.json，但现在已经是内置参数，可以不用额外写了
-     -- dev代表把安装信息写入devDependencies中，没有dev则写入dependencies中
-        -- devDependencies：开发环境依赖
-        -- dependencies：生产环境依赖
-·全局安装和本地安装的区别：
-  -- 全局：可以使用npm root -g查看全局安装目录，一般在C:\Users\Administrator\node_modules下。用户可以在命令行中直接运行该组件包支持的命令。
-  -- 本地：将安装包放在 ./node_modules 下(运行npm时所在的目录，可以通过cd命令调整目录)。通过require() 来引入本地安装的包。注意：npm的原理大概就是从当前目录往上找，找到哪个目录有node_modules就认为这才是真正的项目目录，所以东西全给装那里面去.所以你得保证从你当前的目录开始一直到根目录都没有node_modules，npm才会“正常”地把东西放到当前目录下的。所以本地没正确安装的办法就是①npm root找到其他安装了node_modules的文件夹，然后删除。②当然也可以先npm init再进行本地安装（推荐此种方法！）。
-     -- 本地安装的优点：可以让每个项目拥有独立的包，不受全局包的影响，方便项目的移动、复制、打包等，保证不同版本包之间的相互依赖。另外，本地安装包对于项目的加载会更快。
-     -- 本地安装的缺点：每次新项目都要本地安装所依赖的包，安装包时间相对较长，一来是包太大导致下载慢；二是浪费了硬盘空间。
+* npm包的安装：
+  · npm安装依赖包的2种方式：
+    ~ 全局安装：npm install gulp -g 或 npm install gulp --global
+    ~ 本地安装：npm install gulp 或 npm install gulp --save-dev
+      ~ save代表把你的安装包信息写入package.json文件。npm 5.0.0之前，有--save参数才会把模块写入到packages.json，但现在已经是内置参数，可以不用额外写了
+      ~ dev代表把安装信息写入devDependencies中，没有dev则写入dependencies中
+        ~ devDependencies：开发环境依赖
+        ~ dependencies：生产环境依赖
+  · 全局安装和本地安装的区别：
+    ~ 全局：可以使用npm root -g查看全局安装目录，一般在C:\Users\Administrator\node_modules下。用户可以在命令行中直接运行该组件包支持的命令。
+    ~ 本地：将安装包放在 ./node_modules 下(运行npm时所在的目录，可以通过cd命令调整目录)。通过require() 来引入本地安装的包。注意：npm的原理大概就是从当前目录往上找，找到哪个目录有node_modules就认为这才是真正的项目目录，所以东西全给装那里面去.所以你得保证从你当前的目录开始一直到根目录都没有node_modules，npm才会“正常”地把东西放到当前目录下的。所以本地没正确安装的办法就是①npm root找到其他安装了node_modules的文件夹，然后删除。②当然也可以先npm init再进行本地安装（推荐此种方法！）。
+      ~ 本地安装的优点：可以让每个项目拥有独立的包，不受全局包的影响，方便项目的移动、复制、打包等，保证不同版本包之间的相互依赖。另外，本地安装包对于项目的加载会更快。
+      ~ 本地安装的缺点：每次新项目都要本地安装所依赖的包，安装包时间相对较长，一来是包太大导致下载慢；二是浪费了硬盘空间。
 
 
-*数据源：
-·不同的包服务器就是不同的数据源。因为npm安装包默认是从国外服务器下载，受网络影响大，我们一般会下载在国内的淘宝镜像数据，地址为：https://registry.npm.taobao.org
-·npm设置数据源：
-  -- 临时办法：
-     npm install --registry=https://registry.npm.taobao.org
-     每次install带上registry参数指定数据源
-  -- 写入配置文件
-     npm config set registry https://registry.npm.taobao.org
-     该命令会在～/.npmrc文件里面增加一个配置（如果没有.npmrc文件会自动创建一个）
-     可以使用下面的命令验证是否生效：npm config get registry
-·cnpm:
-  -- cnpm是一个与npm功能类似的包管理工具，主要区别是其默认的数据源为淘宝源
-  -- cnpm跟npm用法基本一致，只是在执行命令时将npm改为cnpm
-  -- cnpm安装方式：npm install cnpm -g --registry=https://registry.npm.taobao.org，安装后记得重启，不然容易错误。
-  -- cnpm与lock：
-     -- cnpm安装时，不会自动创建lock文件，并且后续应该也不会支持，参考这里：https://github.com/cnpm/cnpm/issues/226
-     -- cnpm install时不读锁文件，直接读package.json
-     -- 想要根据lock文件安装依赖时不建议使用cnpm，可以通过指定源的方式安装：npm install --registry=https://registry.npm.taobao.org i
-     -- cnpm安装时不会自动创建lock文件,可以通过npm shrinkwrap生成一个npm-shrinkwrap.json文件，此文件会锁定所有的依赖来源
+* 数据源：
+  · 不同的包服务器就是不同的数据源。因为npm安装包默认是从国外服务器下载，受网络影响大，我们一般会下载在国内的淘宝镜像数据，地址为：https://registry.npm.taobao.org
+  · npm设置数据源：
+    ~ 临时办法：
+      npm install --registry=https://registry.npm.taobao.org
+      每次install带上registry参数指定数据源
+    ~ 写入配置文件
+      npm config set registry https://registry.npm.taobao.org
+      该命令会在～/.npmrc文件里面增加一个配置（如果没有.npmrc文件会自动创建一个）
+      可以使用下面的命令验证是否生效：npm config get registry
+  · cnpm:
+    ~ cnpm是一个与npm功能类似的包管理工具，主要区别是其默认的数据源为淘宝源
+    ~ cnpm跟npm用法基本一致，只是在执行命令时将npm改为cnpm
+    ~ cnpm安装方式：npm install cnpm -g --registry=https://registry.npm.taobao.org，安装后记得重启，不然容易错误。
+    ~ cnpm与lock：
+      ~ cnpm安装时，不会自动创建lock文件，并且后续应该也不会支持，参考这里：https://github.com/cnpm/cnpm/issues/226
+      ~ cnpm install时不读锁文件，直接读package.json
+      ~ 想要根据lock文件安装依赖时不建议使用cnpm，可以通过指定源的方式安装：npm install --registry=https://registry.npm.taobao.org i
+      ~ cnpm安装时不会自动创建lock文件,可以通过npm shrinkwrap生成一个npm-shrinkwrap.json文件，此文件会锁定所有的依赖来源
 
 
-*npm的依赖包版本管理策略：
-·npm采用语义化版本 (semver) 规范进行版本管理。版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
-  -- 主版本号：做了不兼容的 API 修改
-  -- 次版本号：做了向下兼容的功能性新增，
-  -- 修订号：做了向下兼容的问题修正。
-·npm提供了网站 npm semver calculator（https://semver.npmjs.com/） ，可以方便地计算semver的匹配范围。下面列举一些规则示例：
-  -- ^4.1.3：指定的主版本号下，所有更新的版本。又如^1.2.1 代表的更新版本范围为 >=1.2.1 && < 2.0.0
-  -- ~4.1.3：指定的次版本号下，所有更新的版本。又如~1.2.1 代表的更新版本范围为 >=1.2.1 && < 1.3.0
-  -- >4.1.3：版本号大于4.1.3
-  -- <=4.3：版本号小于等于4.3
-  -- 3.1.0 - 4.2.1：版本号在3.1.0到4.2.1之间
-  -- >=3.3.1 <3.8.0：与逻辑，版本号大于等于3.3.1且小于3.8.0
-  -- >4.3.1 || <=2.3.1：或逻辑，版本号大于4.3.1或小于等于2.3.1
-  -- *：所有主版本
-  -- 2或2.*或2.x：主版本号为2的所有版本
-  -- 3.3或3.3.*或3.3.x：版本号为3.3开头的所有版本
-  -- 5.0.0-alpha：预发布版本
-  -- 7.0.0-beta.3：预发布版本
-  -- 1.0.0-rc.3：预发布版本
-·依赖包管理建议
-  -- 使用npm5.2以上的版本，保留package-lock.json文件
-  -- 不要手动修改package-lock.json
-  -- 升级小版本依赖包：npm update <package>
-  -- 升级大版本依赖包: npm install <package>@<version>
-  -- 降级依赖包：npm install <package>@<version>
-  -- 删除依赖包：npm uninstall <package>
-  -- 当提交了package.json，package-lock.json的更新后，应及时拉取更新，并重新npm install重新安装更新后的依赖
+* npm的依赖包版本管理策略：
+  · npm采用语义化版本 (semver) 规范进行版本管理。版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
+    ~ 主版本号：做了不兼容的 API 修改
+    ~ 次版本号：做了向下兼容的功能性新增，
+    ~ 修订号：做了向下兼容的问题修正。
+  · npm提供了网站 npm semver calculator（https://semver.npmjs.com/） ，可以方便地计算semver的匹配范围。下面列举一些规则示例：
+    ~ ^4.1.3：指定的主版本号下，所有更新的版本。又如^1.2.1 代表的更新版本范围为 >=1.2.1 && < 2.0.0
+    ~ ~4.1.3：指定的次版本号下，所有更新的版本。又如~1.2.1 代表的更新版本范围为 >=1.2.1 && < 1.3.0
+    ~ >4.1.3：版本号大于4.1.3
+    ~ <=4.3：版本号小于等于4.3
+    ~ 3.1.0 - 4.2.1：版本号在3.1.0到4.2.1之间
+    ~ >=3.3.1 <3.8.0：与逻辑，版本号大于等于3.3.1且小于3.8.0
+    ~ >4.3.1 || <=2.3.1：或逻辑，版本号大于4.3.1或小于等于2.3.1
+    ~ *：所有主版本
+    ~ 2或2.*或2.x：主版本号为2的所有版本
+    ~ 3.3或3.3.*或3.3.x：版本号为3.3开头的所有版本
+    ~ 5.0.0-alpha：预发布版本
+    ~ 7.0.0-beta.3：预发布版本
+    ~ 1.0.0-rc.3：预发布版本
+  · 依赖包管理建议
+    ~ 使用npm5.2以上的版本，保留package-lock.json文件
+    ~ 不要手动修改package-lock.json
+    ~ 升级小版本依赖包：npm update <package>
+    ~ 升级大版本依赖包: npm install <package>@<version>
+    ~ 降级依赖包：npm install <package>@<version>
+    ~ 删除依赖包：npm uninstall <package>
+    ~ 当提交了package.json，package-lock.json的更新后，应及时拉取更新，并重新npm install重新安装更新后的依赖
 
 
-*npm的配置：
-·npmrc文件
-  -- 修改npm配置除了命令借助命令行来完成，还可以通过.npmrc文件来修改配置
-  -- npm读取config配置的优先级：
-     1、工程目录下的.npmrc文件（/path/to/my/project/.npmrc）
-     2、用户配置文件（~/.npmrc）
-     3、全局配置文件（$PREFIX/etc/npmrc）
-     4、npm内置的配置文件（/path/to/npm/npmrc）
-·package.json：
-  npm的配置文件，它的属性说明如下:
-  -- name：包名。
-  -- version：包的版本号。
-  -- description：包的描述。
-  -- homepage：包的官网 url 。
-  -- author：包的作者姓名。
-  -- contributors：包的其他贡献者姓名。
-  -- dependencies：指定依赖的其它包，这些依赖是指包发布后正常执行时所需要的，也就是线上需要的包。使用下面的命令来安装：npm install --save packageName
-  -- devDependencies：这些依赖只有在开发时候才需要。使用下面的命令来安装：npm install --save-dev packageName 
-  -- scripts：通过设置这个可以使NPM调用一些命令脚本，封装一些功能，如下：
+* npm的配置：
+  · npmrc文件
+    ~ 修改npm配置除了命令借助命令行来完成，还可以通过.npmrc文件来修改配置
+    ~ npm读取config配置的优先级：
+      1、工程目录下的.npmrc文件（/path/to/my/project/.npmrc）
+      2、用户配置文件（~/.npmrc）
+      3、全局配置文件（$PREFIX/etc/npmrc）
+      4、npm内置的配置文件（/path/to/npm/npmrc）
+  · package.json：npm的配置文件，它的属性说明如下:
+    ~ name：包名。
+    ~ version：包的版本号。
+    ~ description：包的描述。
+    ~ homepage：包的官网 url 。
+    ~ author：包的作者姓名。
+    ~ contributors：包的其他贡献者姓名。
+    ~ dependencies：指定依赖的其它包，这些依赖是指包发布后正常执行时所需要的，也就是线上需要的包。使用下面的命令来安装：npm install --save packageName
+    ~ devDependencies：这些依赖只有在开发时候才需要。使用下面的命令来安装：npm install --save-dev packageName 
+    ~ scripts：通过设置这个可以使NPM调用一些命令脚本，封装一些功能，如下：
       "scripts": {
           "start": "babel-node src/pages/index.js",  //相当于在cmd下输入babel-node src/pages/index.js
           "build": "webpack --config config/webpack.config.js",  ////相当于在cmd下输入webpack --config config/webpack.config.js
           "watch": "webpack-dev-server --config config/webpack.config.js --hot --inline --progress"
       }
-  -- repository：包代码存放的地方的类型，可以是 git 或 svn，git 可在 Github 上。
-  -- main：可选字段。这个字段的值是你程序主入口模块的ID。如果其他用户需要你的包，当用户调用require()方法时，返回的就是这个模块的导出（exports）。。
-  -- keywords：关键字
+    ~ repository：包代码存放的地方的类型，可以是 git 或 svn，git 可在 Github 上。
+    ~ keywords：关键字
+    ~ main & module & browser
+      ~ package.json中有main,module和browser共3个字段来定义npm包的入口文件
+        ~ main：定义了npm包的入口文件，browser环境和node环境均可使用
+        ~ module：定义npm包的ESM规范的入口文件，browser环境和node环境均可使用
+        ~ browser：定义npm包在browser环境下的入口文件
+      ~ 文件优先级：
+        由于我们使用的模块规范有 ESM 和 commonJS 两种，为了能在 node 环境下原生执行 ESM 规范的脚本文件，.mjs 文件就应运而生
+        当存在index.mjs和 index.js这种同名不同后缀的文件时，import './index'或者require('./index')是会优先加载index.mjs文件的
+        也就是说，优先级 .mjs > .js
+      ~ 各种情况的优先级：
+        ~ webpack + web + ESM
+          这是我们最常见的使用场景，通过 webpack 打包构建我们的 web 应用，模块语法使用 ESM
+          实际上的加载优先级是 browser = browser+mjs > module > browser+cjs > main 也就是说 webpack 会根据这个顺序去寻找字段指定的文件，直到找到为止
+        ~ webpack + web + commonJS
+          构建 web 应用时，使用 ESM 或者 commonJS 模块规范对于加载优先级并没有任何影响
+          优先级依然是 browser = browser+mjs > module > browser+cjs > main
+        ~ webpack + node + ESM/commonJS
+          优先级是： module > main
+        ~ node + commonJS
+          只有 main 字段有效
+      ~ 小结：
+        ~ 如果包导出的是ESM规范的包，使用module
+        ~ 如果包只在web端使用，并且严禁在server端使用，使用browser
+        ~ 如果包只在server端使用，使用 main
+        ~ 如果包在web端和server端都允许使用，使用browser和main
+    ~ peerDependencies
+      ~ 具有peerDependencies的项目通常不是最终应用，这个项目会被宿主应用作为一个插件或第三方库消费
+      ~ peerDependencies的存在，主要是期望宿主应用安装这些依赖，让相同依赖不会在宿主应用和库中被重复安装
+      ~ 同时为了减少库或插件的大小的目的，将一些依赖统一放到宿主应用安装
+    ~ peerDependenciesMeta：Meta”就有元数据的意思，peerDependenciesMeta就是详细修饰了peerDependicies
+    ~ optionalDependencies：
+      ~ optionalDependencies定义可选的dependencies，npm在安装dependencies过程中出错会退出安装，但对optionalDependencies来说，即使一些依赖安装失败，也不影响最终应用运行，但还要做好相应模块容错处理
+      ~ 另外optionalDependencies会覆盖dependencies中的同名依赖包，所以不要在两个地方都写
+    ~ bundledDependencies / bundleDependencies：期望一些依赖包能出现在最终打包的包里，是一个包含依赖包名的数组
+    ~ bin：
+      ~ bin就是binarary二进制的缩写，里面一般放可执行文件，而package.json中的bin字段用来指定各个内部命令对应的可执行文件的位置
+      ~ 原理：
+        一般情况下，我们想要在命令行中执行某个可执行文件就必须要cd到该执行文件的目录下，或者带上完整路径，否则系统不清楚执行的是哪个目录下的文件。为了不带上路径而方便的使用命令，我们通常会将执行文件的路径配置到全局变量PATH中，这样可以直接执行命令。另外还有一种情况，例如我们全局安装vue-cli之后，也能在任何目录使用vue create xxx来创建项目，这是就是用到了bin字段+符号链接
+        符号链接是一种特殊的文件，包含指定文件的路径引用，类似于桌面的快捷打开方式。例如在项目中局部安装jest包后，npm会在项目中的node_modules/.bin目录下创建一条符号链接，点击这个文件，就会链接到bin字段中定义的jest.js文件。如果是全局安装呢？npm则会在环境变量路径/usr/local/bin目录下（MAC）创建一个symbolic，指向bin字段中声明的文件，这样在当前用户任意目录下，都可以使用bin属性中定义的命令了
+      ~ 比如我们"someTool"包的bin文件如下
+        "bin": {
+          "someTool": "./bin/someTool.js"
+        }
+        ~ 上面代码指定，someTool命令对应的可执行文件为bin子目录下的someTool.js
+        ~ someTool被安装时，npm会寻找这个文件，在node_modules/.bin/目录下文件夹somtTool文件夹建立符号链接
+        ~ 由于node_modules/.bin/目录会在运行时加入环境PATH变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本（https://docs.npmjs.com/cli/run-script、https://docs.npmjs.com/files/package.json#bin）
+    ~ exports：
+      ~ 如果在package.json中定义了exports字段，那么这个字段所定义的内容就是该npm包的真实和全部的导出
+      ~ 如果存在exports属性，exports属性不仅优先级高于main，同时也高于module和browser字段
+    ~ 第三方配置：package.json文件还可以承载命令特有的配置，例如Babel、ESLint等
+      ~ typings
+        typings字段用来指定TypeScript的入口文件："typings": "types/index.d.ts"
+      ~ eslintConfig：eslint的配置可以写在单独的配置文件.eslintrc.json中，也可以写在package.json文件的eslintConfig配置项中
+      ~ babel：babel用来指定Babel的编译配置，如："babel": { "presets": ["@babel/preset-env"] }
+      ~ unpkg：使用该字段可以让包上所有的文件都开启 cdn 服务，该cdn服务由unpkg提供："unpkg": "dist/index.js"
+      ~ lint-staged：是一个在Git暂存文件上运行的工具，会将所有暂存文件的列表传递给任务，通常配合gitHooks/husky一起使用
+      ~ gitHooks：gitHooks用来定义一个钩子，在提交（commit）之前执行ESlint检查
+      ~ browserslist：用来告知支持哪些浏览器及版本
+
+* npm的历史版本：
+  · npm2采用的是递归安装的方法，当项目较复杂时，目录结构也会很深，会出现超出windows系统中路径超过260字符的错误；部分相同的依赖包也会被重复安装，造成大量冗余。
+  · npm3采用扁平结构优化解决了以上问题，但也导致了npm依赖树不能和文件结构所对应了，可以通过npm ls来查看模块间的依赖关系。
+  · npm5依然采用扁平结构，还引入了package-lock.json文件，它可以锁定依赖的安装结构和版本等信息。
+  · 更多详情：./npm的设计缺陷.txt
 
 
-*npm的历史版本：
-·npm2采用的是递归安装的方法，当项目较复杂时，目录结构也会很深，会出现超出windows系统中路径超过260字符的错误；部分相同的依赖包也会被重复安装，造成大量冗余。
-·npm3采用扁平结构优化解决了以上问题，但也导致了npm依赖树不能和文件结构所对应了，可以通过npm ls来查看模块间的依赖关系。
-·npm5依然采用扁平结构，还引入了package-lock.json文件，它可以锁定依赖的安装结构和版本等信息。
-·更多详情：./npm的设计缺陷.txt
-
-
-*Q&A:
-·公共模块在不同层级文件中被引用时，引入路径复杂，非常不方便，难维护，应当如何处理？
-  本地包应用：为了更优雅的引用，可以利用npm本地包将公共模块封装到node_modules中。
-·使用一个npm包时发现它有bug，也找出了它的问题，并直接在node_modules中修复了它，这样并没有用。因为在.gitignore文件一般会忽略提交node_modules，即node_modules不在版本控制内，即使修复了它，下次下载依赖是还是会覆盖修复。如何处理？
-  方法一：把修改后的代码换个名字重新打个包提交到npm，然后直接引用这个新包
-  方法二：把代码copy移出node_modules作为本地依赖
-·npm如何安装同一个包的多个版本：
-  -- npm i <alias>@npm:<packageName>@版本
-  -- 实例：
+* Q&A:
+  · 公共模块在不同层级文件中被引用时，引入路径复杂，非常不方便，难维护，应当如何处理？
+    本地包应用：为了更优雅的引用，可以利用npm本地包将公共模块封装到node_modules中。
+  · 使用一个npm包时发现它有bug，也找出了它的问题，并直接在node_modules中修复了它，这样并没有用。因为在.gitignore文件一般会忽略提交node_modules，即node_modules不在版本控制内，即使修复了它，下次下载依赖是还是会覆盖修复。如何处理？
+    方法一：把修改后的代码换个名字重新打个包提交到npm，然后直接引用这个新包
+    方法二：把代码copy移出node_modules作为本地依赖
+  · npm如何安装同一个包的多个版本：
+    ~ npm i <alias>@npm:<packageName>@版本
+    ~ 实例：
       npm i antd3@npm:antd@3
       npm i antd4@npm:antd@4
-·npm install发生了什么？
-  https://www.zhihu.com/question/66629910
-·npm包的缓存机制：
-  https://blog.csdn.net/daihaoxin/article/details/105749014
+  · npm install发生了什么？
+    https://www.zhihu.com/question/66629910
+  · npm包的缓存机制：
+    https://blog.csdn.net/daihaoxin/article/details/105749014
